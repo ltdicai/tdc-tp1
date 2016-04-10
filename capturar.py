@@ -6,6 +6,7 @@ import sys
 import argparse
 import socket
 import signal
+import math
 from scapy.all import IP, sniff
 from collections import defaultdict
 
@@ -24,6 +25,7 @@ class Run(object):
         self.args = args
         self.total_paquetes = 0
         self.protocolos = defaultdict(int)
+        self.entropia = 0
 
     def correr(self):
         args = self.args
@@ -36,6 +38,7 @@ class Run(object):
         except socket.error:
             print u"No existe interface '{0}'".format(args.interface)
             sys.exit(2)
+        self.finalizar()
 
     def procesar_paquete(self, pkt):
         print pkt.summary()
@@ -46,11 +49,20 @@ class Run(object):
         except Exception:
             print "Error obteniendo tipo"
 
+    def finalizar(self):
+        if self.total_paquetes:
+            for key, value in self.protocolos.items():
+                if value:
+                    prob = float(value)/self.total_paquetes
+                    self.entropia -= prob * math.log(prob, 2)
+
     def resultados(self):
         res = u"Total paquetes: {0}\n".format(self.total_paquetes)
-        res += u"Protocolos:\n"
-        for key, value in self.protocolos.items():
-            res += u"Protocolo {0}: {1}\n".format(key, value)
+        if self.total_paquetes:
+            res += u"Protocolos:\n"
+            for key, value in self.protocolos.items():
+                res += u"Protocolo {0}: {1}\n".format(key, value)
+            res += u"Entropía: {0}".format(self.entropia)
         return res
 
 def main(argv):
