@@ -54,7 +54,7 @@ class Run(object):
         return res
 
 def main(argv):
-    parser = argparse.ArgumentParser(description='Capturar paquetes')
+    parser = argparse.ArgumentParser(description='Capturador de paquetes')
     parser.add_argument(
         "--cantidad", "-c", type=int, default=0, 
         help=u"Cantidad de paquetes a capturar. 0 significa infinito."
