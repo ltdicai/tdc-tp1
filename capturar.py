@@ -7,18 +7,10 @@ import argparse
 import socket
 import signal
 import math
+from scapy import utils
 from scapy.all import IP, sniff
 from collections import defaultdict
 
-def procesar_paquete(pkt):
-    print pkt.summary()
-
-# def signal_handler(signal, frame):
-#     print u"\n"
-#     print u"hola"
-#     sys.exit(0)
-
-#signal.signal(signal.SIGINT, signal_handler)
 
 class Run(object):
     def __init__(self, args):
@@ -26,6 +18,7 @@ class Run(object):
         self.total_paquetes = 0
         self.protocolos = defaultdict(int)
         self.entropia = 0
+        self.pkts = list()
 
     def correr(self):
         args = self.args
@@ -46,8 +39,10 @@ class Run(object):
             tipo = hex(pkt.type)
             self.total_paquetes += 1
             self.protocolos[tipo] += 1
-        except Exception:
-            print "Error obteniendo tipo"
+            if self.args.salida:
+                self.pkts.append(pkt)
+        except Exception, e:
+            print "Error obteniendo tipo ({0}: {1})".format(str(e.type), str(e))
 
     def finalizar(self):
         if self.total_paquetes:
@@ -55,6 +50,8 @@ class Run(object):
                 if value:
                     prob = float(value)/self.total_paquetes
                     self.entropia -= prob * math.log(prob, 2)
+            if self.args.salida:
+                utils.wrpcap(self.args.salida + ".pcap", self.pkts)
 
     def resultados(self):
         res = u"Total paquetes: {0}\n".format(self.total_paquetes)
@@ -81,6 +78,10 @@ def main(argv):
     parser.add_argument(
         "--pcap", "-p", type=str, default=None, 
         help=u"Archivo .pcap"
+    )
+    parser.add_argument(
+        "--salida", "-s", type=str, default=None, 
+        help=u"Archivo de salida"
     )
     args = parser.parse_args(argv[1:])
     run = Run(args)
