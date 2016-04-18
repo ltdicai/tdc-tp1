@@ -11,7 +11,7 @@ modificar la infrastructura y los protocolos
 utilizados a fin de mejorar la calidad del servicio como, incluso,  manipular las actividades que se esten llevando sobre ella.
 
 
-En el presente trabajo observaremos sistemas basados en dos de las tecnologías de redes más difundidas, Ethernet y WiFi 802.11, y analizaremos los datos obtenidos utilizando dos modelos de fuente de información para sacar conclusiones sobre el uso y la configuración de las redes.
+En el presente trabajo observaremos sistemas basados en dos de las tecnologías de redes más difundidas, Ethernet y WiFi 802.11, y analizaremos los datos obtenidos utilizando dos modelos de fuente de información para extraer conclusiones sobre el uso y la configuración de las redes.
 
 
 \subsection{Información y Fuente de información}
@@ -42,11 +42,23 @@ Para poder realizar un envío de paquetes de capa 3 utilizando los servicios de 
 La configuracion de estas tablas ARP se realiza dinámicamente siguiendo un protocolo que consiste básicamente en los siguientes pasos:
 
 \begin{enumerate}
-	\item Un host \textbf{A} desea enviar un paquete a una determinada IP. Si \textbf{A} conoce la direccion MAC a la que debe enviar los paquetes destinados a esa IP, entonces utiliza esa direccion física. Si no, envía un mensaje broadcast dentro de la red (en Ethernet, MAC destino = FF:FF:FF:FF) y aguarda la respuesta. Este mensaje se conoce como \textbf{ARP request}, y lleva la siguiente información:
-	\subitem asad.
-	\item Si dentro de la red existe un host B que sabe como direccionar a la direccion IP requerida, entonces responde al mensaje \textbf{ARP request} con un mensaje \textbf{ARP reply} indicando su dirección física. Este host puede ser el dueño de la dirección IP, o un host intermediario (como un router). Además, actualiza su tabla ARP para relacionar la 
-	\item \textbf{A} recibe el ARP reply de \textbf{B}, actualiza su cache y envía el paquete original utilizando la dirección física de \textbf{B}.
+	\item Un host \textbf{A} desea enviar un paquete a una determinada IP. Si \textbf{A} conoce la direccion MAC a la que debe enviar los paquetes destinados a esa IP, entonces utiliza esa direccion física. Si no, envía un mensaje broadcast dentro de la red  y aguarda la respuesta. Este mensaje se conoce como \textbf{ARP request}, y lleva la siguiente información:
+		\subitem IP origen: IP de A
+		\subitem IP destino: IP a la que se desea enviar un paquete
+		\subitem MAC origen: MAC de A
+		\subitem MAC destino: dirección broadcast de Ethernet (FF:FF:FF:FF)
+	
+	\item Si dentro de la red existe un host B que sabe como direccionar a la direccion IP requerida, entonces responde al mensaje ARP request con un mensaje \textbf{ARP reply} indicando su dirección física. Este host puede ser el dueño de la dirección IP, o un host intermediario (como un router). Además, extrae las direcciones IP origen y MAC origen del paquete ARP request, yactualiza su tabla ARP para relacionarlas.
+	El paquete ARP reply contiene la siguiente información:
+		\subitem IP origen: IP de B
+		\subitem IP destino: IP de A
+		\subitem MAC origen: MAC de B
+		\subitem MAC destino: MAC de A
+
+	\item \textbf{A} recibe el ARP reply de \textbf{B}, actualiza su tabla ARP y envía el paquete original utilizando la dirección física de \textbf{B}.
 \end{enumerate}
+
+Además, cada entrada de las tablas ARP tiene seteado un tiempo de vida. Una vez agotado ese tiempo, la entrada se descarta y debe volver a aprenderse. 
 
 En este informe mostraremos como podemos utilizar la información provista en los paquetes ARP para analizar la topología de una red.
 
