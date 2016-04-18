@@ -1,0 +1,136 @@
+\section{Desarrollo}
+En este inciso explicaremos como se realizó cada ejercicio del trabajo práctico.
+
+\subsection{Herramienta para escuchar}
+Decidimos usar scapy por simplicidad y lo desarrollado en los talleres para escuchar pasivamente la red local
+
+El código de la herrmienta es el siguiente:
+
+\begin{center}
+ \begin{verbatim}
+  #! /usr/bin/python
+  from scapy.all import *
+
+  def monitor_callback(pkt):
+    print pkt.show()
+
+  sniff(prn=monitor_callback,filter="arp",store=0)
+ \end{verbatim}
+
+\end{center}
+
+En este caso hacemos uso de la función sniff para ver todos los paquetes tipo ARP que se envían.
+
+\subsection{Análisis de entropía de una red}
+Uno de los ejercicios solicitaba calcular la entropía de una fuente.
+Para ello debemos definir con presicion dos cosas, la \textbf{fuente de informacion} y el \textbf{evento}, para luego calcular su probabilidad
+y de allí la entropía.
+
+\subsubsection{Experimento 1:}
+
+Definimos los siguientes modelos de fuente de información en un red. Previamente contamos con información de cómo está compuesta dicha red: 2 Notebooks, 2 Smartphones, 1 SmartTV, 1 Desktop/Media Server y 1 Router.
+
+Calcularemos las entropías modificando la \textit{tool} construida. 
+
+\textbf{Modelo 1:}
+\begin{itemize}
+\item \textbf{Fuente de información:} Considero un símbolo como una dirección IP que emite un paquete ARP del tipo \textbf{is-at}.
+\item \textbf{Probabilidad de evento:} Probabilidad de que cierta IP aparezca como emisora de un paquete \textbf{is-at}.
+\end{itemize}
+
+\newpage
+\textbf{pseudocódigo}:
+\begin{algorithm}
+\begin{algorithmic}
+\REQUIRE true
+\ENSURE entropia de una fuente.
+\STATE ipssrc = Diccionario(IP,int).
+\IF{ARP in pkt AND pkt.op = is-at}
+\STATE src = pkt[ARP].psrc
+\STATE ipssrc[src] = ipssrc[src]+1.
+\ENDIF
+\RETURN entropia(ipssrc)
+\end{algorithmic}
+\caption{callback(pkt)}
+\end{algorithm}
+
+
+\textbf{Modelo 2:}
+\begin{itemize}
+\item \textbf{Fuente de información:} Considero un símbolo como una dirección IP por la que se consulta en un paquete ARP del tipo \textbf{who-has}.
+\item \textbf{Probabilidad de evento:} Probabilidad de que cierta IP aparezca como destino de un paquete \textbf{who-has}.
+\end{itemize}
+
+\textbf{pseudocódigo}:
+\begin{algorithm}
+\begin{algorithmic}
+\REQUIRE true
+\ENSURE entropia de una fuente.
+\STATE ipsdst = Diccionario(IP,int).
+\IF{ARP in pkt AND pkt.op = who-has}
+\STATE dst = pkt[ARP].pdst
+\STATE ipsdst[src] = ipsdst[dst]+1.
+\ENDIF
+\RETURN entropia(ipsdst)
+\end{algorithmic}
+\caption{callback(pkt)}
+\end{algorithm}
+
+\subsubsection{Experimento 2:}
+En nuestro segundo experimento, aplicaremos los modelos definidos en el \textit{Experimento 1} a una red empresarial
+con el fin de analizar entropías y al ser una red más grande buscar  nodos distinguidos como podrían ser servidores de archivos, 
+base de datos, servidores de email e inclusive la \textit{puerta de enlace predeterminada}.
+
+%~ \textbf{Modelo 3:}
+%~ \begin{itemize}
+ %~ \item Fuente de información: Considero un símbolo como una dirección IP que recibe un paquete ARP del tipo \textbf{is-at}.
+%~ \item Probabilidad de evento: Probabilidad que cierta IP aparezca  como receptora de un paquete \textbf{is-at}.
+%~ \end{itemize}
+%~ 
+%~ \textbf{pseudocódigo tool utilizada}:
+%~ \begin{algorithm}
+%~ \begin{algorithmic}
+%~ \REQUIRE true
+%~ \ENSURE entropia de una fuente.
+%~ \STATE ipsrcv = Diccionario(IP,int).
+%~ \IF{ARP in pkt AND pkt.op =isat}
+%~ \STATE dst= pkt[ARP].pdst
+%~ \STATE ipsdst[src] = ipsdst[dst]+1.
+%~ \ENDIF
+%~ \RETURN entropia(ipsdst)
+%~ \end{algorithmic}
+%~ \caption{callback(pkt)}
+%~ \end{algorithm}
+%~ 
+%~ 
+%~ \textbf{Modelo 4:}
+%~ \begin{itemize}
+ %~ \item Fuente de información: Considero un símbolo como una dirección IP que recibe un paquete ARP del tipo \textbf{who-has}.
+%~ \item Probabilidad de evento: Probabilidad que cierta IP aparezca  como receptora de un paquete \textbf{who-has}.
+%~ \end{itemize}
+%~ 
+%~ \textbf{pseudocódigo tool utilizada}:
+%~ \begin{algorithm}
+%~ \begin{algorithmic}
+%~ \REQUIRE true
+%~ \ENSURE entropia de una fuente.
+%~ \STATE ipsrcv = Diccionario(IP,int).
+%~ \IF{ARP in pkt AND pkt.op =who-has}
+%~ \STATE dst= pkt[ARP].pdst
+%~ \STATE ipsdst[src] = ipsdst[dst]+1.
+%~ \ENDIF
+%~ \RETURN entropia(ipsdst)
+%~ \end{algorithmic}
+%~ \caption{callback(pkt)}
+%~ \end{algorithm}
+
+
+
+
+
+
+%Teniendo en cuanta esto ahora podemos aplicar la formula \ref{entropia } porque podemos definir un tiempo limitado hasta cuanto 
+%capturar paquetes y luego contar la frecuencia de cada simbolo para definir su probabilidad.
+
+
+

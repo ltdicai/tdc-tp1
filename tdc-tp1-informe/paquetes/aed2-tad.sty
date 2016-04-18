@@ -1,0 +1,268 @@
+%%
+%% This is file `aed2-tad.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% aed2-tad.dtx  (with options: `package')
+%% 
+%% This is a generated file.
+%% 
+%% Copyright (C) 2010 by Catedra Algoritmos y Estructuras de Datos II, FCEN, UBA.
+%% 
+%% This file may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either
+%% version 1.2 of this license or (at your option) any later
+%% version. The latest version of this license is in:
+%% 
+%%    http://www.latex-project.org/lppl.txt
+%% 
+%% and version 1.2 or later is part of all distributions of
+%% LaTeX version 1999/12/01 or later.
+%% 
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{aed2-tad}
+    [2010/04/01 v 1.0 para especificar TADs en AED2]
+\RequirePackage{ifthen}
+\RequirePackage{calc}
+\RequirePackage{aed2-tokenizer}
+\RequirePackage{xargs}
+\typeout{Cargando package 'tad' (09/03/2010)}
+\newlength{\tadMargen}\setlength{\tadMargen}{2em}
+\newlength{\tadSubMargen}\setlength{\tadSubMargen}{1em}
+\newlength{\tadAnchoEncabezados}\setlength{\tadAnchoEncabezados}{6em}
+\newlength{\tadSeparacionTitulos}\setlength{\tadSeparacionTitulos}{4pt}
+\newlength{\tadSeparacionFunciones}\setlength{\tadSeparacionFunciones}{6pt}
+\newlength{\tadAnchoNombreFunciones}\setlength{\tadAnchoNombreFunciones}{0cm}
+\newlength{\tadAnchoTipoFunciones}\setlength{\tadAnchoTipoFunciones}{0cm}
+\newlength{\tadSeparacionAxiomas}\setlength{\tadSeparacionAxiomas}{6pt}
+\newlength{\tadAnchoIzquierdaAxioma}\setlength{\tadAnchoIzquierdaAxioma}{0pt}
+\newcommand{\tadFlecha}{\ensuremath{\longrightarrow}}
+\newcommand{\tadAlinearFunciones}[2]{%
+    \settominwidth{\tadAnchoNombreFunciones}{#1}%
+    \settominwidth{\tadAnchoTipoFunciones}{#2}%
+}
+\newcommand{\tadAlinearAxiomas}[1]{%
+  \settominwidth{\tadAnchoIzquierdaAxioma}{#1}%
+}
+\newcommand{\tad@titskip}{\vspace*{\tadSeparacionTitulos}}
+\newcommand{\tad@funcskip}{\hspace*{\tadSeparacionFunciones}}
+\newcommand{\tad@axiskip}{\hspace*{\tadSeparacionAxiomas}}
+\newboolean{tad@TADenvironment}\setboolean{tad@TADenvironment}{false}
+\newcommand{\ifthen}[2]{\ifthenelse{#1}{#2}{}}
+
+\newlength{\tad@oldparindent}
+\newcommand{\tad@parindent}[1]{%
+    \setlength{\tad@oldparindent}{\parindent}%
+    \setlength{\parindent}{#1}%
+}
+
+\newcommand{\settominwidth}[3][0cm]{%
+    %el tabular con @{} permite eliminar todos el espacio adicional.
+    \settowidth{#2}{\begin{tabular}{@{}l@{}}#3\end{tabular}}%
+    \ifthen{\lengthtest{0pt<#1}\and\lengthtest{#1<#2}}{\setlength{#2}{#1}}%
+}
+
+\newlength{\pbox@len}%
+\newcommandx{\pbox}[3][1=c, 2=0cm]{%
+    \def\pbox@Text##1{##1}%
+    \ifmmode%
+        \def\pbox@Text##1{\text{##1}}%
+    \fi%
+    \pbox@Text{%
+        \settominwidth[#2]{\pbox@len}{#3}%
+        \parbox[#1]{\pbox@len}{#3}%
+    }%
+}
+
+\newlength{\tad@ifFitsElse@largo}
+\newcommand{\tad@ifFitsElse}[4]{%
+    \settominwidth{\tad@ifFitsElse@largo}{#1}%
+    \ifthenelse{\lengthtest{#2>\tad@ifFitsElse@largo}}{#3}{#4}%
+}
+
+\newcommand{\tad@ifFits}[3]{%
+    \tad@ifFitsElse{#1}{#2}{#3}{}%
+}
+
+
+\newcommand{\tad@comienzo}[2][]{%
+    \setboolean{tad@TADenvironment}{true}
+    #1% preambulo
+    \tad@titskip%
+    \par%
+    \noindent \textbf{TAD} #2%
+    \par%
+    \tad@parindent{\tadMargen}% margen exterior
+}
+
+\newcommand{\tad@fin}{%
+    \setboolean{tad@TADenvironment}{false}
+    \tad@titskip%
+    \par%
+    \noindent \textbf{Fin TAD}\hfil%
+    \par%
+    \tad@titskip%
+    \setlength{\parindent}{\tad@oldparindent}%restauro el parindent
+}
+
+\newcommand{\tadEncabezadoInline}[2]{%
+    \tad@titskip%
+    \setlength{\hangindent}{\tadAnchoEncabezados + \parindent}%
+    \tad@ifFitsElse{#1}{\tadAnchoEncabezados}{%
+        \parbox{\tadAnchoEncabezados}{\textbf{#1}}#2%
+    }{%
+        \textbf{#1}\\#2%
+    }%
+}
+
+\newcommand{\tadEncabezado}[2]{%
+    \par\tadEncabezadoInline{#1}{#2}\par%
+}
+
+
+\newlength{\igualobs@pre} %cuanto ocupa la parte del ``para todo n, m: genero, etc''
+\newlength{\igualobs@max} %cuanto es el maximo espacio para las condiciones de igualdad
+\newcommand{\tadIgualdadObservacional}[4]{%
+    %cargamos las variables de longitud
+    \settominwidth{\igualobs@pre}{$(\forall #1, #2: \text{#3})~(~#1 \igobs #2 \ssi~~~~~~~~~~$}%
+    \setlength{\igualobs@max}{\textwidth - \tadAnchoEncabezados - \parindent - \igualobs@pre}%
+    %escribimos la igualdad.
+    \tadEncabezado{igualdad observacional}{%
+        $(\forall #1, #2: \text{#3})~\left(%
+           #1 \igobs #2 \ssi%
+           \left(\pbox[c][\igualobs@max]{#4}\right)%
+        \right)$%
+    }%
+}
+
+\newlength{\igualobssimple@max} %cuanto es el maximo espacio para las condiciones de igualdad
+\newcommand{\tadIgualdadObservacionalSimple}[1]{%
+  \setlength{\igualobssimple@max}{\textwidth - \tadAnchoEncabezados - \parindent}%
+  \tadEncabezado{igualdad observacional}{$\left(\pbox[c][\igualobssimple@max]{#1}\right)$}%
+}
+
+\newcommand{\tadUsa}[1]{\tadEncabezado{usa}{#1}}
+\newcommand{\tadExporta}[1]{\tadEncabezado{exporta}{#1}}
+\newcommand{\tadGeneros}[1]{\tadEncabezado{géneros}{#1}}
+
+\newcommand{\tadExtiende}[1]{\tadEncabezado{extiende}{#1}}
+\newcommand{\tadParametrosFormales}[1]{\tadEncabezado{parámetros formales}{#1}}
+
+\newcommand{\tadAxiomas}[1][]{\tadEncabezado{axiomas}{#1}}
+
+\newcommand{\tad@titulo}[1]{\vspace*{\tadSeparacionTitulos}\par{\textbf{#1}}\par}
+
+\newcommand{\tadObservadores}{\tad@titulo{observadores básicos}{}}
+\newcommand{\tadGeneradores}{\tad@titulo{generadores}{}}
+\newcommand{\tadOtrasOperaciones}{\tad@titulo{otras operaciones}{}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\newcommand{\tadTipoFuncion}[1]{%
+    \edef\@SinProcesar{#1}%
+    \whiledo{\not\equal{\@SinProcesar}{}}{%
+        \GetTokens[,]{@Param}{@Cola}{\@SinProcesar}%
+        \GetTokens[/]{@Tipo}{@Valor}{\@Param}%
+        %
+        \@Tipo%
+        \ifthen{\not\equal{\@Valor}{}}{\ \ensuremath{\@Valor}}%
+        \ifthen{\not\equal{\@Cola}{}}{\ $\times$\ }%
+        \let\@SinProcesar=\@Cola%
+    }%
+}
+
+\newcommand{\tadOperacionInline}[3]{%
+    \ifthenelse{\lengthtest{\tadAnchoNombreFunciones>0pt}}{%
+        \parbox[t]{\tadAnchoNombreFunciones}{#1}%
+    }{%
+        \pbox[t]{#1}%
+    }%
+    \tad@funcskip:\tad@funcskip%
+    \ifthenelse{\lengthtest{\tadAnchoTipoFunciones>0pt}}{%
+        \parbox[t]{\tadAnchoTipoFunciones}{\tadTipoFuncion{#2}~}%
+    }{%
+        \pbox[t]{\tadTipoFuncion{#2}}%
+    }%
+    \ifthen{\not\equal{#2}{}\or\lengthtest{\tadAnchoTipoFunciones>0pt}}{\tad@funcskip}%
+    \tadFlecha\tad@funcskip%
+    \pbox[t]{#3}%
+}
+
+\newsavebox{\@Signatura}
+\newlength{\tadOperacion@textwidth}%
+\newcommand{\tadOperacion}[4]{%
+    \par%
+    \ifthen{\boolean{tad@TADenvironment}}{%
+        \hspace*{\tadSubMargen}%
+        \setlength{\hangindent}{\tadMargen + \tadSubMargen}%
+    }%
+    \sbox{\@Signatura}{\tadOperacionInline{#1}{#2}{#3}}%
+    \usebox{\@Signatura}%
+    \hfill%
+    \ifthenelse{\boolean{tad@TADenvironment}}{%
+        \setlength{\tadOperacion@textwidth}{\linewidth - \tadMargen - \tadSubMargen}%
+        %\setlength{\tadOperacion@textwidth}{\textwidth - \tadMargen - \tadSubMargen}%
+    }{%
+        \setlength{\tadOperacion@textwidth}{\linewidth}%
+    }%
+    \ifthen{\not\equal{#4}{}}{%
+        \tad@ifFitsElse{\usebox{\@Signatura}\hspace*{1.5em}\{#4\}}{\tadOperacion@textwidth}{%
+            \pbox[t]{\{#4\}}%
+        }{%
+            %le damos un poco mas de margen a la restriccion
+            \addtolength{\tadOperacion@textwidth}{-2cm}%
+            %el phantom es para que alinee a derecha.  Hay que poner algo antes del hfill.
+            \\\phantom{a}\hfill%
+            $\left\{\text{\pbox[c][\tadOperacion@textwidth]{#4}}\right\}$%
+        }%
+    }%
+    \par%
+}
+
+\newlength{\tadAxioma@lenEquiv}%espacio que ocupa el equivalente.
+\newlength{\tadAxioma@lenDerecha}%espacio para el parbox de #2
+\newcommand{\tadAxioma}[2]{%
+    \par%
+    %ocupacion del axioma y del equivalente.
+    \settowidth{\tadAxioma@lenEquiv}{\ensuremath{\equiv}}%
+    %indentacion en los reglones sucesivos.
+    \ifthenelse{\lengthtest{\tadAnchoIzquierdaAxioma>0pt}}{%
+        \setlength{\tadAxioma@lenDerecha}{\tadAnchoIzquierdaAxioma}%
+    }{%
+        \settominwidth{\tadAxioma@lenDerecha}{#1}%
+    }%
+    \ifthenelse{\boolean{tad@TADenvironment}}{%
+        \setlength{\tadAxioma@lenDerecha}{\linewidth - \tadMargen - \tadSubMargen - \tadAxioma@lenEquiv - 2\tadSeparacionAxiomas - \tadAxioma@lenDerecha}%
+        %\setlength{\tadAxioma@lenDerecha}{\textwidth - \tadMargen - \tadSubMargen - \tadAxioma@lenEquiv - 2\tadSeparacionAxiomas - \tadAxioma@lenDerecha}%
+    }{%
+        \setlength{\tadAxioma@lenDerecha}{\linewidth - \tadAxioma@lenEquiv - 2\tadSeparacionAxiomas - \tadAxioma@lenDerecha}%
+    }%
+    % escritura del axioma. Sea i = \tadAxioma@lenIzquierdo y m = \tadAnchoIzquierdaAxioma.
+    % hay tres posibilidades: m = 0, 0 < i <= m, 0 < m < i.
+    \ifthen{\boolean{tad@TADenvironment}}{%
+        \hspace*{\tadSubMargen}%
+    }%
+    \ifthenelse{\lengthtest{\tadAnchoIzquierdaAxioma=0pt}}{%
+        #1%
+        \tad@axiskip\ensuremath{\equiv}\tad@axiskip%
+    }{%
+        \tad@ifFitsElse{#1}{\tadAnchoIzquierdaAxioma}{%
+            \parbox[t]{\tadAnchoIzquierdaAxioma}{#1}%
+            \tad@axiskip\ensuremath{\equiv}\tad@axiskip%
+        }{%
+            #1%
+            \tad@axiskip\ensuremath{\equiv}\tad@axiskip%
+            \\%
+        }%
+    }%
+    \parbox[t]{\tadAxioma@lenDerecha}{#2}%
+    \par%
+}
+
+\newenvironment{tad}[1]{\tad@comienzo{#1}}{\tad@fin}
+\newenvironment{tadx}[2]{\tad@comienzo[#2]{#1}}{\tad@fin}
+\endinput
+%%
+%% End of file `aed2-tad.sty'.
