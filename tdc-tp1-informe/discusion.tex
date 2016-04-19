@@ -1,0 +1,111 @@
+\section{Discusion}
+
+En esta sección analizaremos los resultados obtenidos.
+
+\subsection{Analisis de entropias}
+
+En primer experimento definimos dos modelos y calculamos las probabilidades de cada IP y la entropía de las fuentes de información
+que definimos. En base a estos resultados y con los gráficos de la sección \textbf{envios de paquetes} vamos a intentar realizar análisis
+comparando entropías y viendo como impacta el tipo y tamaño de red en las mismas.
+
+Como podemos ver en el cuadro \ref{probabilidadesModel1} hay dos ip que tienen más probabilidad de ser emisoras de un paquete de tipo is at.
+Estos dos nodos de la red son los que de alguna manera más impactan en la entropía ya que al ser sus probabilidades valores significativamente más 
+altos, incrementan la esperanza de la información.
+Además no hay muchos nodos que son emisores de paquete tipo is at, de hecho si vemos la figura \ref{emisorasisat} podemos apreciar que
+el tráfico es coherente con las probabilidades.
+ 
+Ahora si miramos las probabilidades de cada Ip de ser receptora de paquetes who has, vamos a notar en el gráfico \ref{histogramaprobabilidadesModel2}
+que la IP 192.168.1.1 resalta, probablemente este nodo en la red es el default gateway(y en efecto lo es).
+ La entropía en este caso es mucho menor a la anterior, posiblemente porque la distribución de probabilidades es más
+pareja, a excepción del dato recién mencionado. 
+
+Otro análisis que se puede hacer en base a las entropías y probabilidades es que en la figura \ref{histogramaprobabilidadesModel1} 
+la entropía es mayor a 1 y las probabilidades son más parejas lo cuál significa que la información de un paquete ARP puede revelar 
+mucha más información que en el caso de la figura \ref{histogramaprobabilidadesModel2} donde la entropía es menor a 1 y se
+destaca la puerta de enlace predeterminada.
+
+Si hacemos este mismo análisis para la red empresaríal vamos a notar que las probabilidaes son mucho más parejas en todos lo casos, pero
+si vemos el gráfico \ref{histogramaprobabilidadesatos} vemos que la IP 172.16.189.14 se destaca. Este nodo podría ser el 
+más solicitado por ser una puerta de enlace predeterminada, una base de datos o incluso un recurso disponible y muy requerido.
+
+Por otra parte si observamos la tabla \ref{entropiasexperimento2} y lo comparamos con la tabla \ref{entropiashogar} vamos a poder 
+observar que para una misma fuente de información las entropías varían drasticamente dependiendo de la topología de la red y su tamaño.
+De hecho en el primer modelo tenemos una entropia de 1,37 contra una de 3.53, y en el segundo modelo,una entropía de 0,57 contra una
+de 4.352357.
+
+En cuanto a los valores de la entropías con respecto a las probabilidades, en ambos casos es mayor a 1, lo cual nos indica que
+en cada emision/recepción de paquete hay información más valiosa.
+
+
+%Ahora bien podriamos medir que tanto impacta el tamaño según la proporción.
+%En la red hogareña hay solo 7 nodos, mientras que en la red empresarial hay aproximadamente 108 nodos.
+%Si definimos como índice \textbf{entropia/cantidad de nodos} podemos ver que para la primer fuente cada nodo aporta un valor 0,19, mientras que 
+%en la segunda el valor es de tan solo 0.03, es decir la entropía aportada por cada nodo es mucho menor, posiblemente se deba
+%a que las probabilidaes sean más parejas.
+
+%Para la segunda fuente ocurre algo similar pero no tan desproporcioando ya que tenemos un valor aproximado de 0.07 en la hogareña contra 
+%un 0.04 de la red empresarial y comparado con el caso anterior, la diferencia no es tan grande.
+
+Como conclusiones generales de todo esto podemos ver que:
+\begin{itemize}
+ \item El tipo de red impacta en las entropías drasticamente.
+ \item En el caso del segundo modelo, el impacto que tiene el tamaño de la red es mucho menor. 
+ \item En ambos casos podría haber nodos distinguidos, ya sea por emision o recepción de paquetes.
+\item En ambas redes hay muchos nodos con probabilidades de emision/recepcion muy parejas, que sin la presencia de otros nodos distinguidos
+  incrementarian la entropía de la red. 
+\item La red empresarial es bastante heterogenea o bien tiene fragmentos de la misma destinada a proveer servicios.
+\end{itemize}
+
+
+\section{Nodos distinguidos}
+Un nodo distinguido es aquel cuya interacción con otros es más frecuente  ya sea como emisor o receptor de paquetes.
+Intentaremos encontrarlos en las dos redes estudiadas y además veremos si los resultados encontrados se relacionan con lo mencionado en
+la sección anterior.
+Al ser la red hogareña una red pequeña, podemos ver en completitud la cantidad de paquetes enviados y recibidos,
+no pudimos hacer lo mismo en la red empresarial ya que el gráfico obtenido era ilegible, como antes mencionamos, decidimos truncarlo cortando la parte que creemos
+más importante y mostrando solo aquellos nodos que enviaron y recibieron paquetes de una cantidad más alta de la común.
+
+En la figura \ref{emisorasisat} podemos ver los paquetes is-at emitidos en la red hogareña muchos fueron dirigidos a 192.168.1.138 y
+existe cierto nivel de interacción entre 192.168.1.143, 192.168.1.1 y 192.168.1.136.
+
+En la figura \ref{emisoraswhohas} podemos ver una cantidad de paquetes mucho mayor pero con una distribución mucho menos centralizada,
+esta vez  se distingue el nodo 192.168.1.136.
+
+En el caso de la red empresarial el análisis fue mucho más dificil de ver a simple vista, hubo que aplicar criterios y tomar muestras
+por partes. Intentamos lo siguiente:
+\begin{itemize}
+\item Tomar fragmentos de la red.
+\item Reducir la muestra a un tamaño proporcional(teniendo en cuenta la ditribución de probabilidades).
+\item Tomar en cuenta solo aquellos nodo que envian o reciben más de cierta cantidad de paquetes.
+\end{itemize} 
+
+De estas tres opciones solo la ultima nos dió resultados y luego allí tomamos una muestra.
+
+En las figuras \ref{receptoraswhohasatos} y \ref{receptoraswhohasatos2 } podemos ver una fuerte interacción con el nodo de IP 
+172.16.189.86 y un fenómeno mucho más sorprendente es que muy aisladamente el nodo de IP 172.16.189.1 pregunta por 172.16.189.14
+y 172.16.189.103 con mucha frecuencia. Logramos determinar que la 172.16.189.14 no se encontraba disponible (ya sea porque no existía 
+en la red o porque el dispositivo se encontraba apagado) y por tal motivo la IP 172.16.189.1 envíaba paquetes ARP who-has periodicamente.
+Es probable que suceda algo similar con 172.16.189.103.
+
+%Lo malo de haber truncado el grafo de esta manera es que no podemos ver que efectivamente el nodo de IP 172.16.189.14 es el que más
+%probabilidad tiene, posiblemente esto sea porque recibe pocos paquetes por parte de cada uno de los otros nodos, pero si 
+%sumamos el total, es el que mas recibe. La misma observación no aplica para el nodo de IP 172.16.189.1 donde claramente se condice con 
+%lo mostrado en la figura \ref{histogramaprobabilidadesatos}.
+
+En cuanto a la emisión de paquetes is-at podemos contemplar las figuras \ref{emisorasisatatos1 } y \ref{emisorasisatatos2 }, donde pudimos encontrar
+dos casos aislados uno de mayor interacción. En uno  muchos respondian al nodo 172.16.189.167 y en otro una cantidad acotada de nodos
+enviaba la misma cantidad de paquetes a 172.16.189.190.
+
+De esto podemos sacar las siguientes conclusiones:
+\begin{itemize}
+\item Las dos redes presentan nodos aislados a pesar de su distinta utilidad y tamaño, posiblemente se deba a los protocolos de comunicación y armado de tablas de ruteo. 
+\item En el caso de la red empresarial hay una relación entre los gráficos de probabilidades de receptores de paquetes who-has y nodos aislados. 
+\item La red empresarial presenta muchas más interacciones aisladas, posiblemente tenga una cantidad mayor de dispositivos presten servicios muy específicos.
+
+\end{itemize}
+
+ 
+
+
+
+ 

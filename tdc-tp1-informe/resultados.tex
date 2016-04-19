@@ -1,0 +1,181 @@
+\section{Resultados}
+En esta sección mostraremos los resultados de los experimentos.
+
+\subsection{Experimento 1:}
+
+Las entropías calculadas para las 2 fuentes de información propuestas fueron:
+
+\begin{center}
+\begin{tabular}{ l r }
+   Fuente& Entropía  \\
+\hline
+   1 & 1.371641 \\
+   2 & 0.570425 \\
+ \end{tabular}
+\captionof{table}{entropias}
+\label{entropiashogar}
+\end{center}
+
+Probabilidades para el modelo 1 según IPs:
+%\begin{center}
+%\begin{tabular}{ l c r }
+%   Fuente& IP &probabilidad \\
+%\hline
+%   1 & 10.0.0.3  &0.864341085271 \\
+%   2 & 10.0.0.2& 0.135658914729\\
+%\caption{modelo 1}
+% \end{tabular}
+%\captionof{table}{modelo 1}
+%\end{center}
+
+\begin{center}
+\begin{tabular}{ l r }
+   IP &Probabilidad \\
+\hline
+192.168.1.138	& 0.3125 \\
+192.168.1.103	& 0.0625 \\
+192.168.1.137	& 0.1875 \\
+192.168.1.1		& 0.3125 \\
+192.168.1.143	& 0.125 \\
+ \end{tabular}
+\captionof{table}{Modelo 1}
+\label{probabilidadesModel1}
+\end{center}
+
+Probabilidades para el modelo 2 según IPs:
+\begin{center}
+\begin{tabular}{ l r }
+   IP &Probabilidad \\
+\hline
+192.168.1.1		& 0.9017 \\
+192.168.1.103	& 0.0173 \\
+192.168.1.143 	& 0.0115 \\
+192.168.1.137	& 0.0173 \\
+192.168.1.136	& 0.0057 \\
+192.168.1.138	& 0.0462 \\
+ \end{tabular}
+\captionof{table}{Modelo 2}
+\label{probabilidadesModel2}
+\end{center}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale = 0.8]{graficos/emiso_is_at_hogar.pdf}
+	\caption{Histograma Prob./IPs Modelo 1}
+	\label{histogramaprobabilidadesModel1}
+\end{figure}
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale = 0.8]{graficos/recep_who_has_hogar.pdf}
+	\caption{Histograma Prob./IPs Modelo 2}
+	\label{histogramaprobabilidadesModel2}
+\end{figure}
+
+\newpage
+\subsection{Experimento 2:}
+
+\begin{center}
+\begin{tabular}{ l r }
+   Fuente& Entropía  \\
+\hline
+   1 & 3.533684 \\
+   2 & 4.352357 \\
+ \end{tabular}
+\captionof{table}{entropias experimento 2}
+\label{entropiasexperimento2}
+ %\end{tabular}
+\end{center}
+
+En el caso del primer modelo había muchas IP's con la misma probabilidad y datos no significativos que tuvimos que eliminar,
+debido a que perdía mucha claridad el gráfico. Pusimos las IP's con probabilidades más significativas.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale = 0.6]{graficos/emiso_is_at_empresa.pdf}
+	\caption{Histograma Prob./IPs Modelo 1}
+	\label{histogramaprobabilidadesModel1}
+\end{figure}
+
+Con una \textbf{entropía} de \textbf{3.533684}.
+
+
+En nuestro segundo experimento realizado en una red empresarial (clase B), una breve recolección de datos para el Modelo 2 (receptores de paquetes who-has) arrojó la siguiente información:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale = 0.6]{graficos/recep_who_has_empresa.pdf}
+	\caption{Histograma Prob./IPs Modelo 1}
+	\label{histogramaprobabilidadesatos}
+\end{figure}
+
+Con una \textbf{entropía} de \textbf{4.352357}.
+
+\section{Envio de paquetes}
+En esta sección vamos a ver graficamente la cantidad de paquetes que se envian entre si los nodos de la red,con la esperanza de poder 
+sacar algunas conclusiones. Los pesos en las aristas indican la cantidad de paquetes enviados de una IP a otra.
+
+\subsection{Experimento 1}
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale = 0.6]{graficos/emisoras_is_at_red_hogar.png}
+	\caption{paquetes is at emitidos en una red hogareña}
+      \label{emisorasisat}
+\end{figure}
+
+
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale = 0.5]{graficos/receptoras_who_has_red_hogar.png}
+	\caption{paquetes who has en una red hogareña}
+	\label{emisoraswhohas}	
+\end{figure}
+
+\newpage
+
+
+\subsection{Experimento 2}
+En este caso como se trataba de una red empresarial tuvimos que tomar recortes del grafo de envío de paquetes, ya que de lo contrario
+se tornaba ilegible. Capturamos solo partes que colaboran con el objetivo de recolectar nodos distinguidos. 
+Aclaración: En los 2 siguientes gráficos, el nodo apuntado representa a la IP origen mientras que el nodo apuntador es la IP destino.
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale = 0.5]{graficos/receptores_who_has_parte1_atos.png}
+	\caption{paquetes who has en una empresarial}
+	\label{receptoraswhohasatos}	
+\end{figure}
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale = 0.5]{graficos/receptores_who_has_atos_parte2.png}
+	\caption{paquetes who has en una red empresarial(segundo nodo)}
+	\label{receptoraswhohasatos2 }	
+\end{figure}
+
+Aclaración: En los 2 siguientes gráficos, el nodo apuntado representa a la IP destino mientras que el nodo apuntador es la IP origen.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale = 0.5]{graficos/emisoras_is_at_red_atos.png}
+	\caption{paquetes is at en una empresarial}
+	\label{emisorasisatatos1 }	
+\end{figure}
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale = 0.3]{graficos/emisoras_is_at_atos.png}
+	\caption{paquetes is at en una empresarial(segundo nodo)}
+	\label{emisorasisatatos2 }
+\end{figure}
+
+
+
