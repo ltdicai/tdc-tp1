@@ -26,6 +26,7 @@ class Identificador(object):
         self.entropia = 0
         self.pkts = list()
         self.contador = defaultdict(int)
+        self.tabla_arp = dict()
 
     def correr(self):
         args = self.args
@@ -47,8 +48,11 @@ class Identificador(object):
             eth_dst = pkt.dst
             arp_pkt = pkt["ARP"]
             mac_src = arp_pkt.hwsrc
+            ip_src = arp_pkt.psrc
+            self.tabla_arp[ip_src] = mac_src
+            ip_dst = arp_pkt.pdst
             mac_dst = None
-            if arp_pkt.op == "is-at": 
+            if arp_pkt.op == "is-at":
                 mac_dst = arp_pkt.hwdst
             self.contador[mac_src] += 1
             if mac_dst:
@@ -71,6 +75,7 @@ class Identificador(object):
         res = u"";
         for key, value in self.contador.items():
             res += u"{0}: {1}\n".format(key, value)
+        print self.tabla_arp
         return res
         
 

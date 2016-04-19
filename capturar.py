@@ -10,18 +10,22 @@ import math
 from scapy import utils
 from scapy.all import IP, sniff
 from collections import defaultdict
-from matplotlib import pyplot as ptl
+from matplotlib import pyplot as plt
+from matplotlib import figure
+import numpy as np
+
+ARP = '0x806'
 
 PROTOCOL_MAPPINGS = {
     '0x800': "Internet Protocol version 4 (IPv4)",
     '0x806': "Address Resolution Protocol (ARP)",
-    '0x842': "Wake-on-LAN[7]",
+    '0x842': "Wake-on-LAN",
     '0x22f3': "IETF TRILL Protocol",
     '0x6003': "DECnet Phase IV",
     '0x8035': "Reverse Address Resolution Protocol",
     '0x809b': "AppleTalk (Ethertalk)",
     '0x80f3': "AppleTalk Address Resolution Protocol (AARP)",
-    '0x8100': "VLAN-tagged frame (IEEE 802.1Q) and Shortest Path Bridging IEEE 802.1aq[8]",
+    '0x8100': "VLAN-tagged frame (IEEE 802.1Q) and Shortest Path Bridging IEEE 802.1aq",
     '0x8137': "IPX",
     '0x8204': "QNX Qnet",
     '0x86dd': "Internet Protocol Version 6 (IPv6)",
@@ -31,14 +35,14 @@ PROTOCOL_MAPPINGS = {
     '0x8848': "MPLS multicast",
     '0x8863': "PPPoE Discovery Stage",
     '0x8864': "PPPoE Session Stage",
-    '0x8870': "Jumbo Frames (proposed)[2][3]",
+    '0x8870': "Jumbo Frames (proposed)",
     '0x887b': "HomePlug 1.0 MME",
     '0x888e': "EAP over LAN (IEEE 802.1X)",
     '0x8892': "PROFINET Protocol",
     '0x889a': "HyperSCSI (SCSI over Ethernet)",
     '0x88a2': "ATA over Ethernet",
     '0x88a4': "EtherCAT Protocol",
-    '0x88a8': "Provider Bridging (IEEE 802.1ad) & Shortest Path Bridging IEEE 802.1aq[9]",
+    '0x88a8': "Provider Bridging (IEEE 802.1ad) & Shortest Path Bridging IEEE 802.1aq",
     '0x88ab': "Ethernet Powerlink[citation needed]",
     '0x88cc': "Link Layer Discovery Protocol (LLDP)",
     '0x88cd': "SERCOS III",
@@ -53,11 +57,36 @@ PROTOCOL_MAPPINGS = {
     '0x8915': "RDMA over Converged Ethernet (RoCE)",
     '0x891d': "TTEthernet Protocol Control Frame (TTE)",
     '0x892f': "High-availability Seamless Redundancy (HSR)",
-    '0x9000': "Ethernet Configuration Testing Protocol[10]",
+    '0x9000': "Ethernet Configuration Testing Protocol",
 }
 
-def buscar_protocolo(tipo):
+SHORT_NAME = {
+    '0x800': "IPv4",
+    '0x806': "ARP",
+    '0x842': "Wake-on-LAN",
+    '0x8035': "RARP",
+    '0x809b': "AppleTalk",
+    '0x80f3': "AARP",
+    '0x8137': "IPX",
+    '0x8204': "QNX Qnet",
+    '0x86dd': "IPv6",
+    '0x8808': "Ethernet flow control",
+    '0x8819': "CobraNet",
+    '0x8847': "MPLS unicast",
+    '0x8848': "MPLS multicast",
+    '0x8863': "PPPoE Discovery Stage",
+    '0x8864': "PPPoE Session Stage",
+    '0x888e': "EAP over LAN",
+    '0x8892': "PROFINET Protocol",
+    '0x889a': "HyperSCSI (SCSI over Ethernet)",
+    '0x88a2': "ATA over Ethernet",
+    '0x88a4': "EtherCAT Protocol",
+}
+
+def buscar_protocolo(tipo, short=False):
     try:
+        if short:
+            return SHORT_NAME[tipo]
         return PROTOCOL_MAPPINGS[tipo]
     except KeyError:
         return tipo
@@ -86,17 +115,17 @@ class Run(object):
 
     def procesar_paquete(self, pkt):
         try:
-            tipo = buscar_protocolo(hex(pkt.type))
+            tipo = hex(pkt.type)
             if self.offline and self.args.filtro:
-                if 'arp' in self.args.filtro and tipo != "Address Resolution Protocol (ARP)":
+                if 'arp' in self.args.filtro and tipo != ARP:
                     return
             self.total_paquetes += 1
             self.protocolos[tipo] += 1
             if self.args.salida:
                 self.pkts.append(pkt)
             print pkt.summary()
-        except Exception, e:
-            print "Error obteniendo tipo ({0})".format(type(e))
+        except Exception:
+            pass
 
     def finalizar(self):
         if self.total_paquetes:
@@ -112,13 +141,44 @@ class Run(object):
         if self.total_paquetes:
             res += u"Protocolos:\n"
             for key, value in self.protocolos.items():
-                res += u"\tProtocolo {0}: {1}\n".format(key, value)
+                res += u"\tProtocolo {0}: {1}\n".format(buscar_protocolo(key), value)
             res += u"Entropía: {0}".format(self.entropia)
         return res
 
-    def graficar(self):
-        pass
+    def calcular_informacion(self, valor):
+        return float(valor)/self.total_paquetes
 
+    def graficar(self):
+        nombre_base = self.args.graficos
+        etiquetas, valores = zip(*self.protocolos.items())
+        etiquetas = [buscar_protocolo(item, short=True) for item in etiquetas]
+        plt.pie(valores, labels=etiquetas, autopct=self.formato, pctdistance=0.85)
+        plt.axis('equal')
+        plt.title(u"Distribución de paquetes\n(Total paquetes: {0})".format(self.total_paquetes))
+        plt.savefig(nombre_base + "_dist_paquetes.png", dpi=100)
+        plt.close()
+        info_por_simbolo = {
+            key: -math.log(self.calcular_informacion(valor), 2) 
+            for key, valor in self.protocolos.items()
+        }
+        print info_por_simbolo
+        cant_simbolos = len(info_por_simbolo)
+        etiquetas, valores = zip(*info_por_simbolo.items())
+        xbar = np.arange(cant_simbolos)
+        xbarlabels = [val + 0.15 for val in xbar]
+        plt.bar(xbar, valores, 0.35)
+        plt.bar(xbarlabels, np.zeros(cant_simbolos), 0.35, tick_label=etiquetas)
+        plt.bar(xbarlabels, np.zeros(cant_simbolos), 0.35, tick_label=etiquetas)
+        plt.xlim(xmin=-0.5)
+        plt.plot([-10, 10], [self.entropia, self.entropia], 'r')
+        plt.xlabel(u"Información por símbolo")
+        plt.text(-0.4, self.entropia + 0.10, "H(S)")
+        plt.savefig(nombre_base + "_informacion.png", dpi=100)
+        plt.close()
+
+    @staticmethod
+    def formato(valor):
+        return "{0:.2f}%".format(float(valor))
 
 def main(argv):
     parser = argparse.ArgumentParser(description='Capturador de paquetes')
@@ -142,7 +202,7 @@ def main(argv):
         help=u"Archivo de salida"
     )
     parser.add_argument(
-        "--graficos", "-g", type=bool, default=False, 
+        "--graficos", "-g", default=None, type=str,
         help=u"Plotear graficos"
     )
     parser.add_argument(
