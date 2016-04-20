@@ -13,10 +13,20 @@ from collections import defaultdict
 from matplotlib import pyplot as ptl
 from capturar import buscar_protocolo
 
-class Host(object):
-    def __init__(self, mac_address):
-        self.mac_address = mac_address
-        self.ip = None
+WHO_IS = 1
+IS_AT = 2
+
+def reverse_dict(dict_, one=False):
+    if one:
+        res = dict()
+    else:
+        res = defaultdict(set)
+    for key, value in dict_.items():
+        if one:
+            res[value] = key
+        else:
+            res[value].add(key)
+    return dict(res)
 
 class Identificador(object):
     def __init__(self, args):
@@ -27,6 +37,8 @@ class Identificador(object):
         self.pkts = list()
         self.contador = defaultdict(int)
         self.tabla_arp = dict()
+        self.mac2ip = None
+        self.grafo = defaultdict(int)
 
     def correr(self):
         args = self.args
@@ -44,16 +56,17 @@ class Identificador(object):
     def procesar_paquete(self, pkt):
         try:
             print pkt.summary()
-            eth_src = pkt.src
-            eth_dst = pkt.dst
+            # eth_src = pkt.src
+            # eth_dst = pkt.dst
             arp_pkt = pkt["ARP"]
             mac_src = arp_pkt.hwsrc
             ip_src = arp_pkt.psrc
             self.tabla_arp[ip_src] = mac_src
-            ip_dst = arp_pkt.pdst
+            # ip_dst = arp_pkt.pdst
             mac_dst = None
-            if arp_pkt.op == "is-at":
+            if arp_pkt.op == IS_AT:
                 mac_dst = arp_pkt.hwdst
+                self.grafo["{0}-{1}".format(mac_dst, mac_src)] += 1
             self.contador[mac_src] += 1
             if mac_dst:
                 self.contador[mac_dst] += 1 
@@ -70,17 +83,32 @@ class Identificador(object):
     def finalizar(self):
         if self.total_paquetes and self.args.salida:
             utils.wrpcap(self.args.salida + ".pcap", self.pkts)
+        self.mac2ip = reverse_dict(self.tabla_arp, one=True)
+        print self.mac2ip 
 
     def resultados(self):
         res = u"";
         for key, value in self.contador.items():
             res += u"{0}: {1}\n".format(key, value)
-        print self.tabla_arp
+        for key, value in self.grafo.items():
+            mac_src, mac_dst = key.split("-")
+            res += u"Host {ip_src}({mac_src}) quiere hablar con {ip_dst}({mac_dst}) {veces} veces\n".format(
+                ip_src=self._mac2ip(mac_src),
+                ip_dst=self._mac2ip(mac_dst),
+                mac_src=mac_src,
+                mac_dst=mac_dst,
+                veces=value
+            )
         return res
         
-
     def graficar(self):
         pass
+
+    def _mac2ip(self, mac):
+        try:
+            return self.mac2ip[mac]
+        except KeyError:
+            return None
 
 
 def main(argv):
