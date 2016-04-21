@@ -1,22 +1,40 @@
 \section{Experimentos}
 
-Como mencionamos anteriormente, el análisis de paquetes de una red puede utilizarse para inferir información sobre la actividad y topología de la red. En este trabajo, aprovecharemos esta capacidad para encontrar qué protocolos se distinguen del resto, cuál es la incidencia de los paquetes ARP y cuáles son los nodos destacados.
-Realizamos cuatro experimentos para obtener datos. Cada uno se realizó sobre una de las siguientes redes:
+Como mencionamos anteriormente, el análisis de paquetes de una red puede utilizarse para inferir información sobre la actividad y topología de la red. En este trabajo aprovecharemos esta capacidad para dilucidarqué protocolos se distinguen del resto, cuál es la incidencia de los paquetes ARP y cuáles son los nodos destacados de las redes.
+Realizamos cuatro experimentos para obtener datos, uno sobre cada una de las siguientes redes:
 \begin{itemize}
 	\item Red1: Red wiFi de un laboratorio del DC
 	\item Red2: Red Wifi de un bar Starbucks
-	\item Red3: Red Ethernet de un ámbito laboral
-	\item Red4: Red Ethernet de un ámbito laboral
+	\item Red3: Red Ethernet en un ámbito laboral
+	\item Red4: Red Ethernet en un ámbito laboral
 \end{itemize}
+
 
 Modelamos estas redes como dos fuentes de información distintas:
+\begin{enumerate}
+	\item $S$: este modelo fue dado por la cátedra. El alfabeto se define como los protocolos enviados dentro de los paquetes Ethernet capturados durante el experimento. Así mismo, consideramos como función de probabilidad a la frecuencia de cada símbolo dentro del experimento, donde marcamos como ocurrencia de un evento a la observación de un protocolo al capturar un paquete.
+	\item $S1$: con este modelo deseamos poder distinguir los nodos relevantes de una red dada. Para ello, definimos el alfabeto de $S1$ como las direcciones MAC de los paquetes del protocolo ARP. En este caso también tomamos como función de probabilidad a la frecuencia de cada dirección MAC dentro del total observado, pero contabilizando las ocurrencias de cada MAC segun se muestra en el Cuadro \ref{ARP}.
+	
+Hemos de aclarar algunos puntos sobre $S1$. La decisión de utilizar direcciones MAC en lugar de direcciones IP radica en el hecho de querer identificar los nodos físicos dentro de la red observada. Utilizar directamente direcciones IP podría llevar a malinterpretar la topología de la red: por ejemplo, podríamos considerar como relevantes a varios host con distintas IP que se encuentran fuera del sistema en estudio, y no notar que todo el táfico debe pasar por un único nodo propio.
 
-\begin{itemize}
-	\item $S$: el alfabeto se define como los protocolos que se pueden enviar sobre los paquetes Ethernet/WiFi. Tomamos la probabilidad de cada uno como la frecuencia dentro de cada captura.
-	\item $S1$: definimos el alfabeto como las direcciones MAC de los paquetes del protocolo ARP. Consideramos  que se pueden enviar sobre los paquetes Ethernet/WiFi. Tomamos la probabilidad de cada uno como la frecuencia dentro de cada captura.
+Por otra parte, decidimos utilizar las direcciones MAC tal como se muestra en el Cuadro \ref{ARP} pués consideramos que brindan la mayor información acerca de la actividad de cada nodo en la red: enviar un paquete ARP nos da información sobre la existencia del host, y de recibir un paquete ARP (es decir, la existencia de un paquete IS\_AT destinado a un nodo particular) podemos deducir que el nodo destino seguramente continue con envío de más paquetes (es decir, tenga actividad inmediata).
 
-\end{itemize}
-
+	
+		\begin{table}
+			\centering
+		\begin{tabular}{l l}
+				Observación & Eventos contabilizados \\
+				\hline
+				Paquete WHO\_HAS, MAC origen & 1 evento \\
+				Paquete WHO\_HAS, MAC destino & 0 evento \\
+				Paquete IS\_AT, MAC origen & 1 evento\\
+				Paquete IS\_AT, MAC destino & 1 evento\\
+		\end{tabular}
+		\caption{Contabilización de eventos para $S1$}
+		\label{ARP} 
+		\end{table}
+\end{enumerate}
+asdasd
 
 \subsection{Herramientas de sniffing}
 
@@ -49,21 +67,6 @@ Calcularemos las entropías modificando la \textit{tool} construida.
 \item \textbf{Probabilidad de evento:} Probabilidad de que cierta IP aparezca como emisora de un paquete \textbf{is-at}.
 \end{itemize}
 
-\newpage
-\textbf{pseudocódigo}:
-\begin{algorithm}
-\begin{algorithmic}
-\REQUIRE true
-\ENSURE entropia de una fuente.
-\STATE ipssrc = Diccionario(IP,int).
-\IF{ARP in pkt AND pkt.op = is-at}
-\STATE src = pkt[ARP].psrc
-\STATE ipssrc[src] = ipssrc[src]+1.
-\ENDIF
-\RETURN entropia(ipssrc)
-\end{algorithmic}
-\caption{callback(pkt)}
-\end{algorithm}
 
 
 \textbf{Modelo 2:}
@@ -71,14 +74,3 @@ Calcularemos las entropías modificando la \textit{tool} construida.
 \item \textbf{Fuente de información:} Considero un símbolo como una dirección IP por la que se consulta en un paquete ARP del tipo \textbf{who-has}.
 \item \textbf{Probabilidad de evento:} Probabilidad de que cierta IP aparezca como destino de un paquete \textbf{who-has}.
 \end{itemize}
-
-\textbf{pseudocódigo}:
-\begin{algorithm}
-\begin{algorithmic}
-\REQUIRE true
-\ENSURE entropia de una fuente.
-\STATE ipsdst = Diccionario(IP,int).
-\IF{ARP in pkt AND pkt.op = who-has}
-\STATE dst = pkt[ARP].pdst
-\STATE ipsdst[src] = ipsdst[dst]+1.
-\END

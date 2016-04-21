@@ -42,12 +42,12 @@ Para poder realizar envío de paquetes de capa 3 utilizando los servicios de cap
 La configuracion de estas tablas ARP se realiza dinámicamente siguiendo un protocolo que consiste básicamente en los siguientes pasos:
 
 \begin{enumerate}
-	\item Un host \textbf{A} desea enviar un paquete a una determinada IP. Si \textbf{A} conoce la direccion MAC a la que debe enviar los paquetes destinados a esa IP, entonces utiliza esa direccion física. Si no, envía un mensaje broadcast dentro de la red  y aguarda la respuesta. Este mensaje se conoce como \textbf{ARP request}, y lleva la siguiente información:
+	\item Un host \textbf{A} desea enviar un paquete a una determinada IP. Si \textbf{A} conoce la direccion MAC a la que debe enviar los paquetes destinados a esa IP, entonces utiliza esa direccion física. Si no, envía un mensaje broadcast dentro de la red  y aguarda la respuesta. Este mensaje se conoce como \textbf{ARP request} (WHO\_HAS), y lleva la siguiente información:
 		\subitem IP origen: IP de A
 		\subitem IP destino: IP a la que se desea enviar un paquete
 		\subitem MAC origen: MAC de A
 		\subitem MAC destino: dirección broadcast de Ethernet (FF:FF:FF:FF)
-	\item Si dentro de la red existe un host B que sabe como direccionar a la direccion IP requerida, entonces responde al mensaje ARP request con un mensaje \textbf{ARP reply} indicando su dirección física. Este host puede ser el dueño de la dirección IP, o un host intermediario (como un router). Además, extrae las direcciones IP origen y MAC origen del paquete ARP request, yactualiza su tabla ARP para relacionarlas.
+	\item Si dentro de la red existe un host B que sabe como direccionar a la direccion IP requerida, entonces responde al mensaje ARP request con un mensaje \textbf{ARP reply} (IS\_AT) indicando su dirección física. Este host puede ser el dueño de la dirección IP, o un host intermediario (como un router). Además, extrae las direcciones IP origen y MAC origen del paquete ARP request, yactualiza su tabla ARP para relacionarlas.
 	El paquete ARP reply contiene la siguiente información:
 		\subitem IP origen: IP de B
 		\subitem IP destino: IP de A
