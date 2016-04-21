@@ -157,7 +157,7 @@ class Run(object):
         plt.savefig(nombre_base + "_dist_paquetes.png", dpi=150)
         plt.close()
         info_por_simbolo = {
-            buscar_protocolo(key): -math.log(self.calcular_informacion(valor), 2) 
+            buscar_protocolo(key, short=True): -math.log(self.calcular_informacion(valor), 2) 
             for key, valor in self.protocolos.items()
         }
         for key, value in info_por_simbolo.items():
@@ -170,11 +170,9 @@ class Run(object):
             "I(%s)" % buscar_protocolo(key, short=True)
             for key in info_por_simbolo.keys()
         ] 
-        #xbarlabels = ["I({0}) = "buscar_protocolo(val, short=True) for val in etiquetas]
         plt.bar(xbar, valores, 0.35)
         plt.xlim(xmin=-0.5)
         plt.plot([-10, 10], [self.entropia, self.entropia], 'r')
-        #plt.xlabel(u"Información por símbolo", fontsize=14)
         plt.xticks(xbar + 0.15, xbarlabels, fontsize=14)
         
         plt.yticks([self.entropia], ["{0:.2f}".format(self.entropia)], fontsize=14, horizontalalignment='right')

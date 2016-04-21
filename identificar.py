@@ -56,8 +56,6 @@ class Identificador(object):
     def procesar_paquete(self, pkt):
         try:
             print pkt.summary()
-            # eth_src = pkt.src
-            # eth_dst = pkt.dst
             arp_pkt = pkt["ARP"]
             mac_src = arp_pkt.hwsrc
             ip_src = arp_pkt.psrc
@@ -85,16 +83,14 @@ class Identificador(object):
         if self.total_paquetes and self.args.salida:
             utils.wrpcap(self.args.salida + ".pcap", self.pkts)
         for key, value in self.tabla_arp.items():
-            print "%s: %s\n" % (key, str(list(value)))
+            print "%s: %s" % (key, str(list(value)))
         entropia = 0
         total_paquetes = sum(self.contador.values())
         for key, value in self.contador.items():
             prob = float(value)/total_paquetes
+            print "{0}: {1}".format(key, -math.log(prob, 2))
             entropia -= prob * math.log(prob, 2)
-        print entropia
-
-        #self.mac2ip = reverse_dict(self.tabla_arp, one=True)
-        #print self.mac2ip 
+        print "Entropía: ", entropia
 
     def resultados(self):
         res = u"";
