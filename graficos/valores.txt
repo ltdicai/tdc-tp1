@@ -1,0 +1,12 @@
+
+
+RED 4: 
+Total paquetes: 100631
+Protocolos:
+        Protocolo Internet Protocol Version 6 (IPv6): 5690
+        Protocolo Address Resolution Protocol (ARP): 3765
+        Protocolo Internet Protocol version 4 (IPv4): 91176
+Entropía: 0.540670064939
+Internet Protocol version 4 (IPv4):0.142349
+Internet Protocol Version 6 (IPv6):4.144502
+Address Resolution Protocol (ARP):4.740281

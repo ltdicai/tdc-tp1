@@ -36,7 +36,7 @@ class Identificador(object):
         self.entropia = 0
         self.pkts = list()
         self.contador = defaultdict(int)
-        self.tabla_arp = dict()
+        self.tabla_arp = defaultdict(set)
         self.mac2ip = None
         self.grafo = defaultdict(int)
 
@@ -61,12 +61,12 @@ class Identificador(object):
             arp_pkt = pkt["ARP"]
             mac_src = arp_pkt.hwsrc
             ip_src = arp_pkt.psrc
-            self.tabla_arp[ip_src] = mac_src
-            # ip_dst = arp_pkt.pdst
+            self.tabla_arp[mac_src].add(ip_src)
+            ip_dst = arp_pkt.pdst
             mac_dst = None
             if arp_pkt.op == IS_AT:
                 mac_dst = arp_pkt.hwdst
-                self.grafo["{0}-{1}".format(mac_dst, mac_src)] += 1
+                self.grafo["{0}/{1}-{2}/{3}".format(mac_dst, ip_dst, mac_src, ip_src)] += 1
             self.contador[mac_src] += 1
             if mac_dst:
                 self.contador[mac_dst] += 1 
@@ -75,6 +75,7 @@ class Identificador(object):
                 self.pkts.append(pkt)
         except Exception, e:
             print "Error procesando paquete({0})".format(type(e))
+            raise e
 
     @staticmethod
     def filtrar(pkt):
@@ -83,18 +84,29 @@ class Identificador(object):
     def finalizar(self):
         if self.total_paquetes and self.args.salida:
             utils.wrpcap(self.args.salida + ".pcap", self.pkts)
-        self.mac2ip = reverse_dict(self.tabla_arp, one=True)
-        print self.mac2ip 
+        for key, value in self.tabla_arp.items():
+            print "%s: %s\n" % (key, str(list(value)))
+        entropia = 0
+        total_paquetes = sum(self.contador.values())
+        for key, value in self.contador.items():
+            prob = float(value)/total_paquetes
+            entropia -= prob * math.log(prob, 2)
+        print entropia
+
+        #self.mac2ip = reverse_dict(self.tabla_arp, one=True)
+        #print self.mac2ip 
 
     def resultados(self):
         res = u"";
         for key, value in self.contador.items():
             res += u"{0}: {1}\n".format(key, value)
         for key, value in self.grafo.items():
-            mac_src, mac_dst = key.split("-")
+            src, dst = key.split("-")
+            mac_src, ip_src = src.split("/")
+            mac_dst, ip_dst = dst.split("/")
             res += u"Host {ip_src}({mac_src}) quiere hablar con {ip_dst}({mac_dst}) {veces} veces\n".format(
-                ip_src=self._mac2ip(mac_src),
-                ip_dst=self._mac2ip(mac_dst),
+                ip_src=ip_src,
+                ip_dst=ip_dst,
                 mac_src=mac_src,
                 mac_dst=mac_dst,
                 veces=value
@@ -103,12 +115,6 @@ class Identificador(object):
         
     def graficar(self):
         pass
-
-    def _mac2ip(self, mac):
-        try:
-            return self.mac2ip[mac]
-        except KeyError:
-            return None
 
 
 def main(argv):
@@ -155,3 +161,5 @@ if __name__ == '__main__':
     except (OSError, AttributeError):
         pass
     main(sys.argv)
+
+

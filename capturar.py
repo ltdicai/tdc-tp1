@@ -154,27 +154,32 @@ class Run(object):
         etiquetas = [buscar_protocolo(item, short=True) for item in etiquetas]
         plt.pie(valores, labels=etiquetas, autopct=self.formato, pctdistance=0.85)
         plt.axis('equal')
-        plt.title(u"Distribución de paquetes\n(Total paquetes: {0})".format(self.total_paquetes))
-        plt.savefig(nombre_base + "_dist_paquetes.png", dpi=100)
+        plt.savefig(nombre_base + "_dist_paquetes.png", dpi=150)
         plt.close()
         info_por_simbolo = {
-            key: -math.log(self.calcular_informacion(valor), 2) 
+            buscar_protocolo(key): -math.log(self.calcular_informacion(valor), 2) 
             for key, valor in self.protocolos.items()
         }
-        print info_por_simbolo
+        for key, value in info_por_simbolo.items():
+            print "%s:%f" % (key, value)
+        #print info_por_simbolo
         cant_simbolos = len(info_por_simbolo)
         etiquetas, valores = zip(*info_por_simbolo.items())
         xbar = np.arange(cant_simbolos)
-        xbarlabels = [val + 0.15 for val in xbar]
+        xbarlabels = [
+            "I(%s)" % buscar_protocolo(key, short=True)
+            for key in info_por_simbolo.keys()
+        ] 
+        #xbarlabels = ["I({0}) = "buscar_protocolo(val, short=True) for val in etiquetas]
         plt.bar(xbar, valores, 0.35)
-        # plt.bar(xbarlabels, np.zeros(cant_simbolos), 0.35, tick_label=etiquetas)
-        # plt.bar(xbarlabels, np.zeros(cant_simbolos), 0.35, tick_label=etiquetas)
         plt.xlim(xmin=-0.5)
         plt.plot([-10, 10], [self.entropia, self.entropia], 'r')
-        plt.xlabel(u"Información por símbolo")
-        plt.xticks(xbarlabels)
-        plt.text(-0.4, self.entropia + 0.10, "H(S)")
-        plt.savefig(nombre_base + "_informacion.png", dpi=100)
+        #plt.xlabel(u"Información por símbolo", fontsize=14)
+        plt.xticks(xbar + 0.15, xbarlabels, fontsize=14)
+        
+        plt.yticks([self.entropia], ["{0:.2f}".format(self.entropia)], fontsize=14, horizontalalignment='right')
+        plt.text(2.55, self.entropia - 0.05, "H(S)")
+        plt.savefig(nombre_base + "_informacion.png", dpi=150)
         plt.close()
 
     @staticmethod
