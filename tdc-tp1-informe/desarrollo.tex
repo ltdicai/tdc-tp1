@@ -14,10 +14,7 @@ Modelamos estas redes como dos fuentes de información distintas:
 \begin{enumerate}
 	\item $S$: este modelo fue dado por la cátedra. El alfabeto se define como los protocolos enviados dentro de los paquetes Ethernet capturados durante el experimento. Así mismo, consideramos como función de probabilidad a la frecuencia de cada símbolo dentro del experimento, donde marcamos como ocurrencia de un evento a la observación de un protocolo al capturar un paquete.
 	\item $S1$: con este modelo deseamos poder distinguir los nodos relevantes de una red dada. Para ello, definimos el alfabeto de $S1$ como las direcciones MAC de los paquetes del protocolo ARP. En este caso también tomamos como función de probabilidad a la frecuencia de cada dirección MAC dentro del total observado, pero contabilizando las ocurrencias de cada MAC segun se muestra en el Cuadro \ref{ARP}.
-	
-Hemos de aclarar algunos puntos sobre $S1$. La decisión de utilizar direcciones MAC en lugar de direcciones IP radica en el hecho de querer identificar los nodos físicos dentro de la red observada. Utilizar directamente direcciones IP podría llevar a malinterpretar la topología de la red: por ejemplo, podríamos considerar como relevantes a varios host con distintas IP que se encuentran fuera del sistema en estudio, y no notar que todo el táfico debe pasar por un único nodo propio.
-
-Por otra parte, decidimos utilizar las direcciones MAC tal como se muestra en el Cuadro \ref{ARP} pués consideramos que brindan la mayor información acerca de la actividad de cada nodo en la red: enviar un paquete ARP nos da información sobre la existencia del host, y de recibir un paquete ARP (es decir, la existencia de un paquete IS\_AT destinado a un nodo particular) podemos deducir que el nodo destino seguramente continue con envío de más paquetes (es decir, tenga actividad inmediata).
+La decisión de utilizar direcciones MAC en lugar de direcciones IP radica en el hecho de querer identificar los nodos físicos dentro de la red observada. Utilizar directamente direcciones IP podría llevar a malinterpretar la topología de la red: por ejemplo, podríamos considerar como relevantes a varios host con distintas IP que se encuentran fuera del sistema en estudio, y no notar que todo el táfico debe pasar por un único nodo propio. Por otra parte, decidimos utilizar las direcciones MAC tal como se muestra en el Cuadro \ref{ARP} pués consideramos que brindan la mayor información acerca de la actividad de cada nodo en la red: enviar un paquete ARP nos da información sobre la existencia del host, y de recibir un paquete ARP (es decir, la existencia de un paquete IS\_AT destinado a un nodo particular) podemos deducir que el nodo destino seguramente continue con envío de más paquetes (es decir, tenga actividad inmediata).
 
 	
 		\begin{table}
@@ -34,43 +31,37 @@ Por otra parte, decidimos utilizar las direcciones MAC tal como se muestra en el
 		\label{ARP} 
 		\end{table}
 \end{enumerate}
-asdasd
 
 \subsection{Herramientas de sniffing}
 
-Para capturar y procesar la información, utilizamos tanto el programa \textit{Wireshark} como un script (capturar.py), escrito en Python, utilizando la librería para análisis de redes \textit{scapy}. Ambas herramientas hacen uso del modo promíscuo de la placa de red, en el cual se capturan no solo los paquetes dirigidos a el host que esta capturando, sino todos los paquetes que se envíen por el medio.
+Para capturar y procesar la información, utilizamos tanto el programa \textit{Wireshark} como dos script (capturar.py, identificar.py), escritos en Python, utilizando la librería para análisis de redes \textit{scapy}. Ambas herramientas hacen uso del modo promíscuo de la placa de red, en el cual se capturan no solo los paquetes dirigidos a el host que esta capturando, sino todos los paquetes que se envíen por el medio.
 
-En su forma de ejecución básica, el script que desarrollamos muestra por pantalla cada paquete que captura hasta que sea detenido con una interrupción (CTRl+C). Al finalizar, se muestra el total de paquetes capturados, los protocolos de dichos paquetes (junto con la cantidad correspondiente), y la entropía del mode
-
- la cantidad de paquetes  Incorporamos otros modos de ejecución.se realiza a través del comando siguiente comando (para ver otras opciónes , ejecutar el comando con la opción \textit{-h}.)
-
+\subsubsection{Implementación de $S$: capturar.py}
+En su forma de ejecución básica, el script muestra por pantalla cada paquete que captura hasta que sea detenido con una interrupción (CTRl+C). Al finalizar, se muestra 
+\begin{enumerate}
+	\item el total de paquetes capturados
+	\item los protocolos observados (junto con la cantidad de veces que se observo cada uno)
+	\item la entropía correspondiente modelo $S$. 
+\end{enumerate}
+Si bien incorporamos varias opciones de ejecución (ejecutar el comando con la opción \textit{-h}.), la forma más sencilla corresponde a 
 \begin{verbatim}
-	sudo python capturar.py -i <interfaz_de_captura>
+sudo python capturar.py -i <interfaz_de_captura>
 \end{verbatim}
 
+\subsubsection{Implementación de $S1$: identificar.py}
+Este script es similar a capturar.py, pero en lugar de analizar los protocolos de cada paquete, filtra solo los paquetes ARP e implementa el modelo de fuente $S1$. Al igual que capturar.py, el script muestra por pantalla cada paquete que captura hasta que sea detenido con una interrupción (CTRl+C). Al finalizar, devuelve
+\begin{enumerate}
+	\item un diccionario donde se mapea direcciones MAC con direcciones IP
+	\item las direcciones MAC observadas (junto con la cantidad de veces que se observo cada una)
+	\item la entropía correspondiente modelo $S1$. 
+\end{enumerate}
+Para ver opciones de ejecución, ejecutar el comando con \textit{-h}.). la forma más sencilla corresponde a 
+\begin{verbatim}
+sudo python identificar.py -i <interfaz_de_captura>
+\end{verbatim}
 
 
 \subsection{Análisis de entropía de una red}
 Uno de los ejercicios solicitaba calcular la entropía de una fuente.
 Para ello debemos definir con presicion dos cosas, la \textbf{fuente de informacion} y el \textbf{evento}, para luego calcular su probabilidad
 y de allí la entropía.
-
-\subsubsection{Experimento 1:}
-
-Definimos los siguientes modelos de fuente de información en un red. Previamente contamos con información de cómo está compuesta dicha red: 2 Notebooks, 2 Smartphones, 1 SmartTV, 1 Desktop/Media Server y 1 Router.
-
-Calcularemos las entropías modificando la \textit{tool} construida. 
-
-\textbf{Modelo 1:}
-\begin{itemize}
-\item \textbf{Fuente de información:} Considero un símbolo como una dirección IP que emite un paquete ARP del tipo \textbf{is-at}.
-\item \textbf{Probabilidad de evento:} Probabilidad de que cierta IP aparezca como emisora de un paquete \textbf{is-at}.
-\end{itemize}
-
-
-
-\textbf{Modelo 2:}
-\begin{itemize}
-\item \textbf{Fuente de información:} Considero un símbolo como una dirección IP por la que se consulta en un paquete ARP del tipo \textbf{who-has}.
-\item \textbf{Probabilidad de evento:} Probabilidad de que cierta IP aparezca como destino de un paquete \textbf{who-has}.
-\end{itemize}
