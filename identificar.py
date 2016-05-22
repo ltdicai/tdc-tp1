@@ -5,13 +5,10 @@ import os
 import sys
 import argparse
 import socket
-import signal
 import math
 from scapy import utils
-from scapy.all import IP, sniff
+from scapy.all import sniff
 from collections import defaultdict
-from matplotlib import pyplot as ptl
-from capturar import buscar_protocolo
 
 WHO_IS = 1
 IS_AT = 2
@@ -108,9 +105,6 @@ class Identificador(object):
                 veces=value
             )
         return res
-        
-    def graficar(self):
-        pass
 
 
 def main(argv):
@@ -135,10 +129,6 @@ def main(argv):
         help=u"Archivo de salida"
     )
     parser.add_argument(
-        "--graficos", "-g", type=bool, default=False, 
-        help=u"Plotear graficos"
-    )
-    parser.add_argument(
         "--tiempo", "-t", type=int, default=None, 
         help=u"Correr hasta tantos segundos"
     )
@@ -146,8 +136,6 @@ def main(argv):
     ident = Identificador(args)
     ident.correr()
     print ident.resultados()
-    if args.graficos:
-        ident.graficar()
 
 if __name__ == '__main__':
     try:
