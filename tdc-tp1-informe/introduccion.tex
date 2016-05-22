@@ -1,60 +1,42 @@
 \section{Introducción}
 
-Las redes de computadoras han dejado de ser 
-una tecnología reservada a ciertos ambitos científicos y militares para convertirse
-en piezas fundamentales en el desarrollo de casi cualquier actividad, a tal grado que las relaciones humanas, 
-desde el comercio hasta las guerras, han sido profundamente transformadas por la conectividad
-alcanzada en los últimos años.  
-Es por esto que analizar los distintos aspectos de una red
-puede proveer información útil para comprender el uso que se esta dando a la red, informacion que sirve tanto para
-modificar la infrastructura y los protocolos
-utilizados a fin de mejorar la calidad del servicio como, incluso,  manipular las actividades que se esten llevando sobre ella.
+	
+Existen situaciones en las que se desea conocer la topología de una red con el fin de determinar nodos distinguidos dentro de la misma.
+Por ejemplo, podría necesitarse encontrar cual es la direccíon IP del gateway utilizado en la red; o determinar la dirección de un servidor de base de datos.
+Si bien los paquetes IP enviados no contienen dicha información \textsl{per se}, ésta puede obtenerse analizando el flujo de paquetes ARP que viajan por la red. 
+ARP (\textsl{Address Resolution Protocol}) es un protocolo de control ideado para mapear direcciones IP (capa 3) con direcciones fisicas (capa 2); en el caso de de una red Ethernet, ARP es utilizado para mapear direcciones IP con direcciones MAC.
+La utilización de ARP genera un tabla cache de traducción que es utilizada como referencia. 
+El protocolo consiste básicamente en los siguientes pasos:
 
+\begin{enumerate}
+	\item Un host \textbf{A} desea enviar un paquete a una determinada IP. Si tiene la dirección IP en su cache, utiliza la direccion física almacenada; si no, envía un mensaje broadcast dentro de la red (en Ethernet, MAC destino = FF:FF:FF:FF) y aguarda la respuesta. Este mensaje se conoce como \textbf{ARP request}.
+	\item Si dentro de la red existe un host B que sabe como direccionar a la direccion IP requerida, responde al mensaje ARP request con un mensaje \textbf{ARP reply} que indica su dirección física. Este host puede ser el dueño de la dirección IP, o un host intermediario como un router.
+	\item \textbf{A} recibe el ARP reply de \textbf{B}, actualiza su cache y envía el paquete original utilizando la dirección física de \textbf{B}.
+\end{enumerate}
 
-En el presente trabajo experimentaremos sobre sistemas basados en dos de las tecnologías de redes más difundidas, Ethernet y WiFi 802.11, y analizaremos los datos obtenidos utilizando dos modelos de fuente de información para extraer conclusiones sobre el uso y la configuración de las redes. Los conceptos teóricos sobre los que basaremos el analisis se presentan a continuación.
-
+En este informe mostraremos como podemos utilizar la información provista en los paquetes ARP para analizar la topología de una red.
 
 \subsection{Información y Fuente de información}
 
-Una fuente de información es todo aquello que emite mensajes de acuerdo a una ley de probabilidad fija. Los mensajes pertenecen a un conjunto finito de símbolos $S={s_{1},...,s_{n}}$, conocido como el alfabeto de la fuente. La emisión de un símbolo $s_i$ por parte de la fuente $S$ representa un evento que tiene asociada una probabilidad fija $P_S(s_i)$ de ocurrir. 
-
-Dado un evento $e$ con probabilidad $P(e)$, se define la \textbf{información del evento $e$} como
+Dado un evento E con probabilidad \textsl{P(E)}, se define la \textbf{información del evento E} como
 
 \begin{center}
-$I(e)=-\log{P(e)}$ 
+$I(E)=-\log{P(E)}$ 
 \end{center}
 
-$I(e)$ es una medida de la cantidad de información que obtenemos por la ocurrencia de E: mientras más improbable sea E, mayor será la información brindada por su ocurrencia (menor sera la incertidumbre sobre el hecho observado). Dicho de otra manera, si sabemos que un evento E tiene alta probabilidad de ocurrir, entonces su ocurrencia no aportará mucha información sobre lo que se esta observando.
+I(E) es una medida de la cantidad de información que obtenemos por la ocurrencia de E: mientras más improbable sea E, mayor será la información brindada por su ocurrencia. Dicho de otra manera, si sabemos que un evento E tiene alta probabilidad de ocurrir, entonces su ocurrencia no aportará mucha información sobre lo que se esta observando.
 
+Por otro lado, una fuente de información es todo aquello que emite mensajes de acuerdo a una ley de probabilidad fija; los mensajes pertenecen a un conjunto finito de símbolos $S={s_{1},...,s_{n}}$, conocido como el alfabeto de la fuente, y la fuente en si misma está definida por su alfabeto. En este contexo, cada emisión de un mensaje representa un evento que aporta información.
 
 
 \subsection{Entropía}
 
-Dada una fuente de información $S={s_{1},...,s_{n}}$, se define la entropía de S, $H(S)$, como la suma ponderada de la información de casa simbolo de S
+La entropía de una fuente de información mide la incertidumbre de la fuente.
+Dada una fuente de informacion $S={s_{1},...,s_{n}}$, se define la entropía de S como la suma ponderada de la información de casa simbolo de S,
 
 $$H(S)=\sum^{n}_{i=1}{P(s_{i})*I(s_{i})}$$
 
-La entropía de una fuente de información mide la cantidad de información esperada al observar la emisión de un nuevo símbolo por parte de la fuente. Dado un evento $e$
 
-\subsection{ARP}
 
-Para poder realizar envío de paquetes de capa 3 utilizando los servicios de capa 2 es necesario poder realizar un mapeo entre las direcciones de ambas capas. ARP (\textsl{Address Resolution Protocol}) es un protocolo de control que surge como respuesta a esta necesidad. Cada host y switch de una red mantiene una tabla ARP donde se relaciona una dirección lógica $d$ con la direccion física $f$ a la que debe entregarse cualquier paquete destinado a $d$ (el host con direccion física $f$ no es necesariamente el destinatario de la dirección $d$: puede ser un intermediario que sabe como hacer llegar el paquete a $d$). En el caso de redes IP sobre Ethernet, ARP es utilizado para mapear direcciones IP con direcciones MAC. 
-La configuracion de estas tablas ARP se realiza dinámicamente siguiendo un protocolo que consiste básicamente en los siguientes pasos:
-
-\begin{enumerate}
-	\item Un host \textbf{A} desea enviar un paquete a una determinada IP. Si \textbf{A} conoce la direccion MAC a la que debe enviar los paquetes destinados a esa IP, entonces utiliza esa direccion física. Si no, envía un mensaje broadcast dentro de la red  y aguarda la respuesta. Este mensaje se conoce como \textbf{ARP request} (WHO\_HAS), y lleva la siguiente información:
-		\subitem IP origen: IP de A
-		\subitem IP destino: IP a la que se desea enviar un paquete
-		\subitem MAC origen: MAC de A
-		\subitem MAC destino: dirección broadcast de Ethernet (FF:FF:FF:FF)
-	\item Si dentro de la red existe un host B que sabe como direccionar a la direccion IP requerida, entonces responde al mensaje ARP request con un mensaje \textbf{ARP reply} (IS\_AT) indicando su dirección física. Este host puede ser el dueño de la dirección IP, o un host intermediario (como un router). Además, extrae las direcciones IP origen y MAC origen del paquete ARP request, yactualiza su tabla ARP para relacionarlas.
-	El paquete ARP reply contiene la siguiente información:
-		\subitem IP origen: IP de B
-		\subitem IP destino: IP de A
-		\subitem MAC origen: MAC de B
-		\subitem MAC destino: MAC de A
-	\item \textbf{A} recibe el ARP reply de \textbf{B}, actualiza su tabla ARP y envía el paquete original utilizando la dirección física de \textbf{B}.
-\end{enumerate}
-Además, cada entrada de las tablas ARP tiene seteado un tiempo de vida. Una vez agotado ese tiempo, la entrada se descarta y debe volver a aprenderse. 
 
 

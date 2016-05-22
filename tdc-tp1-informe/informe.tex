@@ -1,0 +1,119 @@
+\documentclass[a4paper,spanish]{article}
+\usepackage[a4paper,margin=1.5cm,top=0.5cm,bottom=0.5cm]{geometry}
+\usepackage[pdftex]{graphicx}
+
+% Paquetes varios, entre otras cosas, para poder escribir con acentos!
+\selectlanguage{spanish}
+\usepackage{anysize} 
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{hyperref}
+\usepackage[pdftex]{graphicx}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{array} 
+\usepackage{tabularx}
+\usepackage{textcomp}
+\usepackage{pdfpages}
+\usepackage[small]{caption}
+
+
+
+%\usepackage{newclude}
+
+\usepackage{fancyhdr}
+
+\usepackage{paquetes/caratula}		% Si no tienen este paquete en sus paquetes de latex, 
+
+%\hoffset=-2.5cm
+%\textwidth=17cm
+%\parskip=1ex
+
+\pagestyle{fancy}
+
+% Paquete para poder escribir los simbolos de naturales, enteros, reales...
+% Si no lo tienen, hagan --> sudo apt-get install texlive-fonts-extra
+% La cagada es que pesa unos 100 MB...
+
+% \usepackage{dsfont}
+
+% Paquetes para escribir algoritmos:
+
+\usepackage{paquetes/algorithm}		% Si no tienen este paquete en sus paquetes de latex, 
+                                  % este archivo tiene que estar en la carpeta donde estan nuestros .tex
+\usepackage{paquetes/algorithmic}	% Idem que el de arriba
+
+%\input{spanishAlgorithmic}	% Este SI o SI tiene que estar en la carpeta donde estan nuestros  .tex
+
+%\usepackage{moreverb}
+%\usepackage{verbatim} %entorno verbatim para codigo fuente
+
+% Aca pueden ver bien como se usa el paquete...
+% http://www.rosapolis.net/2008/04/21/escribir-algoritmos-en-latex/
+
+\DeclareGraphicsExtensions{.bmp,.png,.pdf,.jpg,.eps}
+\hypersetup {colorlinks=false, pdfborder={0 0 0}}
+\newcommand{\fullref}[1]{sección \ref{#1}}
+\newcommand{\quotel}{\textquotedblleft}
+\newcommand{\quoter}{\textquotedblright \ }
+
+% Cosas del enunciado de ellos
+
+\parskip = 11pt
+\newcommand{\real}{\hbox{\bf R}}
+
+% No deja sangria al comienzo de los parrafos!
+%\setlength\parindent{0pt}
+
+\begin{document}
+
+\materia{Teoría de las Comunicaciones}
+\submateria{}
+\titulo{TP1a: Wiretapping}
+\subtitulo{}
+%\grupo{Nombre Grupo}
+\integrante{Celave, Martín}{530/08}{tolacelave@gmail.com}
+\integrante{Beniti Raul}{592/08}{raulbenitti@gmail.com}
+\integrante{Coronel Ezequiel}{352/08 }{ecoronel@dc.uba.ar}
+
+
+
+\fecha{}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+%\input{abstract.tex}
+%\newpage
+
+%\input{jerarquia.tex}
+%\newpage
+
+\input{introduccion.tex}
+\newpage
+
+\input{desarrollo.tex}
+\newpage
+
+\input{resultados.tex}
+\newpage
+
+\input{discusion.tex}
+\newpage
+
+
+
+
+
+%\input{conclusiones.tex}	
+%\newpage
+
+%\input{apendices.tex}	
+%\newpage
+
+%\input{referencias.tex}
+
+\end{document}

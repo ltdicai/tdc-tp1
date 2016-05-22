@@ -1,67 +1,136 @@
-\section{Experimentos}
+\section{Desarrollo}
+En este inciso explicaremos como se realizó cada ejercicio del trabajo práctico.
 
-Como mencionamos anteriormente, el análisis de paquetes de una red puede utilizarse para inferir información sobre la actividad y topología de la red. En este trabajo aprovecharemos esta capacidad para dilucidarqué protocolos se distinguen del resto, cuál es la incidencia de los paquetes ARP y cuáles son los nodos destacados de las redes.
-Realizamos cuatro experimentos para obtener datos, uno sobre cada una de las siguientes redes:
-\begin{itemize}
-	\item Red1: Red wiFi de un laboratorio del DC
-	\item Red2: Red Wifi de un bar Starbucks
-	\item Red3: Red Ethernet en un ámbito laboral
-	\item Red4: Red Ethernet en un ámbito laboral
-\end{itemize}
+\subsection{Herramienta para escuchar}
+Decidimos usar scapy por simplicidad y lo desarrollado en los talleres para escuchar pasivamente la red local
 
+El código de la herrmienta es el siguiente:
 
-Modelamos estas redes como dos fuentes de información distintas:
-\begin{enumerate}
-	\item $S$: este modelo fue dado por la cátedra. El alfabeto se define como los protocolos enviados dentro de los paquetes Ethernet capturados durante el experimento. Así mismo, consideramos como función de probabilidad a la frecuencia de cada símbolo dentro del experimento, donde marcamos como ocurrencia de un evento a la observación de un protocolo al capturar un paquete.
-	\item $S1$: con este modelo deseamos poder distinguir los nodos relevantes de una red dada. Para ello, definimos el alfabeto de $S1$ como las direcciones MAC de los paquetes del protocolo ARP. En este caso también tomamos como función de probabilidad a la frecuencia de cada dirección MAC dentro del total observado, pero contabilizando las ocurrencias de cada MAC segun se muestra en el Cuadro \ref{ARP}.
-La decisión de utilizar direcciones MAC en lugar de direcciones IP radica en el hecho de querer identificar los nodos físicos dentro de la red observada. Utilizar directamente direcciones IP podría llevar a malinterpretar la topología de la red: por ejemplo, podríamos considerar como relevantes a varios host con distintas IP que se encuentran fuera del sistema en estudio, y no notar que todo el táfico debe pasar por un único nodo propio. Por otra parte, decidimos utilizar las direcciones MAC tal como se muestra en el Cuadro \ref{ARP} pués consideramos que brindan la mayor información acerca de la actividad de cada nodo en la red: enviar un paquete ARP nos da información sobre la existencia del host, y de recibir un paquete ARP (es decir, la existencia de un paquete IS\_AT destinado a un nodo particular) podemos deducir que el nodo destino seguramente continue con envío de más paquetes (es decir, tenga actividad inmediata).
+\begin{center}
+ \begin{verbatim}
+  #! /usr/bin/python
+  from scapy.all import *
 
-	
-		\begin{table}
-			\centering
-		\begin{tabular}{l l}
-				Observación & Eventos contabilizados \\
-				\hline
-				Paquete WHO\_HAS, MAC origen & 1 evento \\
-				Paquete WHO\_HAS, MAC destino & 0 evento \\
-				Paquete IS\_AT, MAC origen & 1 evento\\
-				Paquete IS\_AT, MAC destino & 1 evento\\
-		\end{tabular}
-		\caption{Contabilización de eventos para $S1$}
-		\label{ARP} 
-		\end{table}
-\end{enumerate}
+  def monitor_callback(pkt):
+    print pkt.show()
 
-\subsection{Herramientas de sniffing}
+  sniff(prn=monitor_callback,filter="arp",store=0)
+ \end{verbatim}
 
-Para capturar y procesar la información, utilizamos tanto el programa \textit{Wireshark} como dos script (capturar.py, identificar.py), escritos en Python, utilizando la librería para análisis de redes \textit{scapy}. Ambas herramientas hacen uso del modo promíscuo de la placa de red, en el cual se capturan no solo los paquetes dirigidos a el host que esta capturando, sino todos los paquetes que se envíen por el medio.
+\end{center}
 
-\subsubsection{Implementación de $S$: capturar.py}
-En su forma de ejecución básica, el script muestra por pantalla cada paquete que captura hasta que sea detenido con una interrupción (CTRl+C). Al finalizar, se muestra 
-\begin{enumerate}
-	\item el total de paquetes capturados
-	\item los protocolos observados (junto con la cantidad de veces que se observo cada uno)
-	\item la entropía correspondiente modelo $S$. 
-\end{enumerate}
-Si bien incorporamos varias opciones de ejecución (ejecutar el comando con la opción \textit{-h}.), la forma más sencilla corresponde a 
-\begin{verbatim}
-sudo python capturar.py -i <interfaz_de_captura>
-\end{verbatim}
-
-\subsubsection{Implementación de $S1$: identificar.py}
-Este script es similar a capturar.py, pero en lugar de analizar los protocolos de cada paquete, filtra solo los paquetes ARP e implementa el modelo de fuente $S1$. Al igual que capturar.py, el script muestra por pantalla cada paquete que captura hasta que sea detenido con una interrupción (CTRl+C). Al finalizar, devuelve
-\begin{enumerate}
-	\item un diccionario donde se mapea direcciones MAC con direcciones IP
-	\item las direcciones MAC observadas (junto con la cantidad de veces que se observo cada una)
-	\item la entropía correspondiente modelo $S1$. 
-\end{enumerate}
-Para ver opciones de ejecución, ejecutar el comando con \textit{-h}.). la forma más sencilla corresponde a 
-\begin{verbatim}
-sudo python identificar.py -i <interfaz_de_captura>
-\end{verbatim}
-
+En este caso hacemos uso de la función sniff para ver todos los paquetes tipo ARP que se envían.
 
 \subsection{Análisis de entropía de una red}
 Uno de los ejercicios solicitaba calcular la entropía de una fuente.
 Para ello debemos definir con presicion dos cosas, la \textbf{fuente de informacion} y el \textbf{evento}, para luego calcular su probabilidad
 y de allí la entropía.
+
+\subsubsection{Experimento 1:}
+
+Definimos los siguientes modelos de fuente de información en un red. Previamente contamos con información de cómo está compuesta dicha red: 2 Notebooks, 2 Smartphones, 1 SmartTV, 1 Desktop/Media Server y 1 Router.
+
+Calcularemos las entropías modificando la \textit{tool} construida. 
+
+\textbf{Modelo 1:}
+\begin{itemize}
+\item \textbf{Fuente de información:} Considero un símbolo como una dirección IP que emite un paquete ARP del tipo \textbf{is-at}.
+\item \textbf{Probabilidad de evento:} Probabilidad de que cierta IP aparezca como emisora de un paquete \textbf{is-at}.
+\end{itemize}
+
+\newpage
+\textbf{pseudocódigo}:
+\begin{algorithm}
+\begin{algorithmic}
+\REQUIRE true
+\ENSURE entropia de una fuente.
+\STATE ipssrc = Diccionario(IP,int).
+\IF{ARP in pkt AND pkt.op = is-at}
+\STATE src = pkt[ARP].psrc
+\STATE ipssrc[src] = ipssrc[src]+1.
+\ENDIF
+\RETURN entropia(ipssrc)
+\end{algorithmic}
+\caption{callback(pkt)}
+\end{algorithm}
+
+
+\textbf{Modelo 2:}
+\begin{itemize}
+\item \textbf{Fuente de información:} Considero un símbolo como una dirección IP por la que se consulta en un paquete ARP del tipo \textbf{who-has}.
+\item \textbf{Probabilidad de evento:} Probabilidad de que cierta IP aparezca como destino de un paquete \textbf{who-has}.
+\end{itemize}
+
+\textbf{pseudocódigo}:
+\begin{algorithm}
+\begin{algorithmic}
+\REQUIRE true
+\ENSURE entropia de una fuente.
+\STATE ipsdst = Diccionario(IP,int).
+\IF{ARP in pkt AND pkt.op = who-has}
+\STATE dst = pkt[ARP].pdst
+\STATE ipsdst[src] = ipsdst[dst]+1.
+\ENDIF
+\RETURN entropia(ipsdst)
+\end{algorithmic}
+\caption{callback(pkt)}
+\end{algorithm}
+
+\subsubsection{Experimento 2:}
+En nuestro segundo experimento, aplicaremos los modelos definidos en el \textit{Experimento 1} a una red empresarial
+con el fin de analizar entropías y al ser una red más grande buscar  nodos distinguidos como podrían ser servidores de archivos, 
+base de datos, servidores de email e inclusive la \textit{puerta de enlace predeterminada}.
+
+%~ \textbf{Modelo 3:}
+%~ \begin{itemize}
+ %~ \item Fuente de información: Considero un símbolo como una dirección IP que recibe un paquete ARP del tipo \textbf{is-at}.
+%~ \item Probabilidad de evento: Probabilidad que cierta IP aparezca  como receptora de un paquete \textbf{is-at}.
+%~ \end{itemize}
+%~ 
+%~ \textbf{pseudocódigo tool utilizada}:
+%~ \begin{algorithm}
+%~ \begin{algorithmic}
+%~ \REQUIRE true
+%~ \ENSURE entropia de una fuente.
+%~ \STATE ipsrcv = Diccionario(IP,int).
+%~ \IF{ARP in pkt AND pkt.op =isat}
+%~ \STATE dst= pkt[ARP].pdst
+%~ \STATE ipsdst[src] = ipsdst[dst]+1.
+%~ \ENDIF
+%~ \RETURN entropia(ipsdst)
+%~ \end{algorithmic}
+%~ \caption{callback(pkt)}
+%~ \end{algorithm}
+%~ 
+%~ 
+%~ \textbf{Modelo 4:}
+%~ \begin{itemize}
+ %~ \item Fuente de información: Considero un símbolo como una dirección IP que recibe un paquete ARP del tipo \textbf{who-has}.
+%~ \item Probabilidad de evento: Probabilidad que cierta IP aparezca  como receptora de un paquete \textbf{who-has}.
+%~ \end{itemize}
+%~ 
+%~ \textbf{pseudocódigo tool utilizada}:
+%~ \begin{algorithm}
+%~ \begin{algorithmic}
+%~ \REQUIRE true
+%~ \ENSURE entropia de una fuente.
+%~ \STATE ipsrcv = Diccionario(IP,int).
+%~ \IF{ARP in pkt AND pkt.op =who-has}
+%~ \STATE dst= pkt[ARP].pdst
+%~ \STATE ipsdst[src] = ipsdst[dst]+1.
+%~ \ENDIF
+%~ \RETURN entropia(ipsdst)
+%~ \end{algorithmic}
+%~ \caption{callback(pkt)}
+%~ \end{algorithm}
+
+
+
+
+
+
+%Teniendo en cuanta esto ahora podemos aplicar la formula \ref{entropia } porque podemos definir un tiempo limitado hasta cuanto 
+%capturar paquetes y luego contar la frecuencia de cada simbolo para definir su probabilidad.
+
+
+
