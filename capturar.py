@@ -97,6 +97,7 @@ class Run(object):
         self.offline = bool(args.pcap)
         self.total_paquetes = 0
         self.protocolos = defaultdict(int)
+        self.info_por_simbolo = dict()
         self.entropia = 0
         self.pkts = list()
 
@@ -132,6 +133,7 @@ class Run(object):
             for key, value in self.protocolos.items():
                 if value:
                     prob = float(value)/self.total_paquetes
+                    self.info_por_simbolo[key] = - math.log(prob, 2)
                     self.entropia -= prob * math.log(prob, 2)
             if self.args.salida:
                 utils.wrpcap(self.args.salida + ".pcap", self.pkts)
@@ -141,7 +143,7 @@ class Run(object):
         if self.total_paquetes:
             res += u"Protocolos:\n"
             for key, value in self.protocolos.items():
-                res += u"\tProtocolo {0}: {1}\n".format(buscar_protocolo(key), value)
+                res += u"\tProtocolo {0}: {1} {2}\n".format(buscar_protocolo(key), value, self.info_por_simbolo[key])
             res += u"Entropía: {0}".format(self.entropia)
         return res
 
@@ -216,7 +218,7 @@ def main(argv):
     args = parser.parse_args(argv[1:])
     run = Run(args)
     run.correr()
-    print run.resultados()
+    print run.resultados().encode("utf-8")
     if args.graficos:
         run.graficar()
 

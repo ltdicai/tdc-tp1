@@ -33,6 +33,7 @@ class Identificador(object):
         self.entropia = 0
         self.pkts = list()
         self.contador = defaultdict(int)
+        self.contador_ip = defaultdict(int)
         self.tabla_arp = defaultdict(set)
         self.mac2ip = None
         self.grafo = defaultdict(int)
@@ -56,9 +57,12 @@ class Identificador(object):
             arp_pkt = pkt["ARP"]
             mac_src = arp_pkt.hwsrc
             ip_src = arp_pkt.psrc
+            if ip_src == "0.0.0.0": # ARP Probe
+                return
             self.tabla_arp[mac_src].add(ip_src)
             ip_dst = arp_pkt.pdst
             mac_dst = None
+            self.contador_ip[ip_dst] += 1
             if arp_pkt.op == IS_AT:
                 mac_dst = arp_pkt.hwdst
                 self.grafo["{0}/{1}-{2}/{3}".format(mac_dst, ip_dst, mac_src, ip_src)] += 1
@@ -82,11 +86,17 @@ class Identificador(object):
         for key, value in self.tabla_arp.items():
             print "%s: %s" % (key, str(list(value)))
         entropia = 0
-        total_paquetes = sum(self.contador.values())
-        for key, value in self.contador.items():
+        # total_paquetes = sum(self.contador.values())
+        # for key, value in self.contador.items():
+        #     prob = float(value)/total_paquetes
+        #     print "{0}: {1}".format(key, -math.log(prob, 2))
+        #     entropia -= prob * math.log(prob, 2)
+        # print "Entropía: ", entropia
+        total_paquetes = sum(self.contador_ip.values())
+        for key, value in self.contador_ip.items():
             prob = float(value)/total_paquetes
-            print "{0}: {1}".format(key, -math.log(prob, 2))
             entropia -= prob * math.log(prob, 2)
+            print "{0:15},{1:>},{2:>}".format(key, value, -math.log(prob, 2))
         print "Entropía: ", entropia
 
     def resultados(self):
@@ -135,7 +145,7 @@ def main(argv):
     args = parser.parse_args(argv[1:])
     ident = Identificador(args)
     ident.correr()
-    print ident.resultados()
+    print ident.resultados().encode("utf-8")
 
 if __name__ == '__main__':
     try:
