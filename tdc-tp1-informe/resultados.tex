@@ -1,7 +1,6 @@
 \section{Resultados y discusión}
-En esta sección mostraremos los resultados de los experimentos.
 
-\subsection{Experimentos de identificación de protocolos}
+\subsection{Experimentos de captura de protocolos}
 
 El objetivo de este experimento fue modelar el tráfico de la red como una fuente de información cuyos símbolos son los protocolos que están contenidos dentro de los paquetes Ethernet, a la que llamamos $S$.
 
@@ -85,6 +84,8 @@ También podemos observar tanto en la figura \ref{red3_capturar_entropia} y \ref
 
 Veamos ahora el resultado de correr la herramienta \texttt{identificar.py} sobre las mismas capturas de las redes anteriores pero considerando a la fuente de información $S_1$ como aquella que emite direcciones de IP que aparecen como destino en los paquetes WHO\_HAS.
 
+\subsubsection{Laboratorio de universidad}
+
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.65]{imgs/red1_identificar.png}
@@ -92,12 +93,20 @@ Veamos ahora el resultado de correr la herramienta \texttt{identificar.py} sobre
       \label{red1_identificar}
 \end{figure}
 
+En la figura \ref{red1_identificar} podemos ver la cantidad de apariciones de cada dirección IP en los paquetes ARP de la red de la facultad. En realidad hay más direcciones IP en la lista, pero eran demasiadas para graficar, así que nos quedamos con las que más veces aparecen. Analizando la captura de los datos podemos ver que muchas de esas apariciones son de paquetes WHO\_HAS repetidos, donde un mismo nodo pregunta varias veces por esa IP. Esto es algo normal en una red WiFi porque es un medio poco confiable y suelen perderse los paquetes, más en una red con mucho tráfico. Esta es la razón también de porque la presencia de paquetes ARP en esta red era bastante grande, en comparación con otras redes. La cantidad de información que agregan paquetes repetidos claramente es baja, ya que más de un paquete no nos dice nada nuevo sobre la topología de la red.
+
+\subsubsection{Cafetería}
+
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.65]{imgs/red2_identificar.png}
 	\caption{Cantidad de apariciones de direcciones IP en los paquetes ARP de la red 2}
       \label{red2_identificar}
 \end{figure}
+
+En un caso más normal, en la figura \ref{red2_identificar} podemos ver que el nodo con más apariciones es la primera dirección IP de la red \texttt{10.254.33.1\/24} que usualmente es el que se le asigna al router que se encargará de recibir y enviar paquetes entre la Internet y la red propiamente dicha. Un dispositivo cuando se conecta a la red WiFi necesita saber a qué dispositivo mandar los paquetes hacia Internet, así que realiza un envío de un paquete ARP preguntando por la dirección física de la IP \texttt{10.254.33.1}. Como los dispositivos en una cafetería van y vienen, es esperable la aparición de muchos de estos paquetes.
+
+\subsubsection{Ambientes laborales}
 
 \begin{figure}[H]
 	\centering
@@ -112,3 +121,5 @@ Veamos ahora el resultado de correr la herramienta \texttt{identificar.py} sobre
 	\caption{Cantidad de apariciones de direcciones IP en los paquetes ARP de la red 4}
       \label{red4_identificar}
 \end{figure}
+
+En las redes de ambientes de trabajo de las figuras \ref{red3_identificar} y \ref{red4_identificar} la dirección IP \texttt{128.1.1.1} no es la que más aparece, sino que hay otras. Posiblemente estas IP que más aparecen correspondan con nodos distinguidos en la red como un servidor, una base de datos, una impresora o algún otro recurso compartido por red.
