@@ -1,189 +1,114 @@
-\section{Resultados}
+\section{Resultados y discusión}
 En esta sección mostraremos los resultados de los experimentos.
 
-\subsection{Laboratorio de Universidad}
+\subsection{Experimentos de identificación de protocolos}
 
-Primero veamos los resultados de correr la herramienta \texttt{capturar.py} 
+El objetivo de este experimento fue modelar el tráfico de la red como una fuente de información cuyos símbolos son los protocolos que están contenidos dentro de los paquetes Ethernet, a la que llamamos $S$.
 
-\subsection{Cafetería}
-
-\subsection{Ambientes laborales}
-
-\subsection{Experimento 1:}
-
-Las entropías calculadas para las 2 fuentes de información propuestas fueron:
-
-\begin{center}
-\begin{tabular}{ l r }
-   Fuente& Entropía  \\
-\hline
-   1 & 1.371641 \\
-   2 & 0.570425 \\
- \end{tabular}
-\captionof{table}{entropias}
-\label{entropiashogar}
-\end{center}
-
-Probabilidades para el modelo 1 según IPs:
-%\begin{center}
-%\begin{tabular}{ l c r }
-%   Fuente& IP &probabilidad \\
-%\hline
-%   1 & 10.0.0.3  &0.864341085271 \\
-%   2 & 10.0.0.2& 0.135658914729\\
-%\caption{modelo 1}
-% \end{tabular}
-%\captionof{table}{modelo 1}
-%\end{center}
-
-\begin{center}
-\begin{tabular}{ l r }
-   IP &Probabilidad \\
-\hline
-192.168.1.138	& 0.3125 \\
-192.168.1.103	& 0.0625 \\
-192.168.1.137	& 0.1875 \\
-192.168.1.1		& 0.3125 \\
-192.168.1.143	& 0.125 \\
- \end{tabular}
-\captionof{table}{Modelo 1}
-\label{probabilidadesModel1}
-\end{center}
-
-Probabilidades para el modelo 2 según IPs:
-\begin{center}
-\begin{tabular}{ l r }
-   IP &Probabilidad \\
-\hline
-192.168.1.1		& 0.9017 \\
-192.168.1.103	& 0.0173 \\
-192.168.1.143 	& 0.0115 \\
-192.168.1.137	& 0.0173 \\
-192.168.1.136	& 0.0057 \\
-192.168.1.138	& 0.0462 \\
- \end{tabular}
-\captionof{table}{Modelo 2}
-\label{probabilidadesModel2}
-\end{center}
-
-% \begin{figure}[H]
-% 	\centering
-% 	\includegraphics[scale = 0.8]{graficos/emiso_is_at_hogar.pdf}
-% 	\caption{Histograma Prob./IPs Modelo 1}
-% 	\label{histogramaprobabilidadesModel1}
-% \end{figure}
-% 
-% 
-% \begin{figure}[H]
-% 	\centering
-% 	\includegraphics[scale = 0.8]{graficos/recep_who_has_hogar.pdf}
-% 	\caption{Histograma Prob./IPs Modelo 2}
-% 	\label{histogramaprobabilidadesModel2}
-% \end{figure}
-
-\newpage
-\subsection{Experimento 2:}
-
-\begin{center}
-\begin{tabular}{ l r }
-   Fuente& Entropía  \\
-\hline
-   1 & 3.533684 \\
-   2 & 4.352357 \\
- \end{tabular}
-\captionof{table}{entropias experimento 2}
-\label{entropiasexperimento2}
- %\end{tabular}
-\end{center}
-
-En el caso del primer modelo había muchas IP's con la misma probabilidad y datos no significativos que tuvimos que eliminar,
-debido a que perdía mucha claridad el gráfico. Pusimos las IP's con probabilidades más significativas.
-
-% \begin{figure}[H]
-% 	\centering
-% 	\includegraphics[scale = 0.6]{graficos/emiso_is_at_empresa.pdf}
-% 	\caption{Histograma Prob./IPs Modelo 1}
-% 	\label{histogramaprobabilidadesModel1}
-% \end{figure}
-% 
-% Con una \textbf{entropía} de \textbf{3.533684}.
-% 
-% 
-% En nuestro segundo experimento realizado en una red empresarial (clase B), una breve recolección de datos para el Modelo 2 (receptores de paquetes who-has) arrojó la siguiente información:
-% 
-% \begin{figure}[H]
-% 	\centering
-% 	\includegraphics[scale = 0.6]{graficos/recep_who_has_empresa.pdf}
-% 	\caption{Histograma Prob./IPs Modelo 1}
-% 	\label{histogramaprobabilidadesatos}
-% \end{figure}
-
-Con una \textbf{entropía} de \textbf{4.352357}.
-
-\section{Envio de paquetes}
-En esta sección vamos a ver graficamente la cantidad de paquetes que se envian entre si los nodos de la red,con la esperanza de poder 
-sacar algunas conclusiones. Los pesos en las aristas indican la cantidad de paquetes enviados de una IP a otra.
-
-\subsection{Experimento 1}
-
+\subsubsection{Laboratorio de universidad}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[scale = 0.6]{graficos/emisoras_is_at_red_hogar.png}
-	\caption{paquetes is at emitidos en una red hogareña}
-      \label{emisorasisat}
+	\includegraphics[scale=0.65]{imgs/red1_capturar.png}
+	\caption{Distribución de protocolos de la red 1}
+      \label{red1_capturar}
 \end{figure}
 
-
-
+Como podemos ver en la figura \ref{red1_capturar} hay un protocolo que tiene más presencia a la red: IPv4. Este protocolo es la piedra fundamental de la Internet, y es el que se usa para enviar paquetes de una red a otra a nivel mundial. IPv6 también se puede utilizar, pero todavía no tiene la suficiente adpoción como para reemplazar totalmente a IPv4, pero es una cuestión de tiempo ya que IPv4 está encontrando limitaciones técnicas que IPv6 soluciona. También aparecen en la red paquetes que usan el protocolo ARP descripto anteriormente que permite a los nodos de la red conocer la ubicación de otros nodos. Más adelante veremos el por qué de las apariciones de paquetes de protocolo ARP para esta red.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[scale = 0.5]{graficos/receptoras_who_has_red_hogar.png}
-	\caption{paquetes who has en una red hogareña}
-	\label{emisoraswhohas}	
+	\includegraphics[scale=0.65]{imgs/red1_capturar_entropia.png}
+	\caption{Cantidad de información que aporta cada protocolo, junto a la entropía de la fuente}
+      \label{red1_capturar_entropia}
 \end{figure}
 
+Se puede apreciar en la figura \ref{red1_capturar_entropia} como vale la relación entre mayor cantidad de apariciones en la red implican un menor aporte de información. Asimismo vale la inversa, protocolos con pocas apariciones aportan mucha más información acerca de la fuente. La entropía viene a hacer el papel de un valor de información medio esperado por la fuente. Es decir, en cualquier momento se espera que la fuente arroje en promedio símbolos con información igual a la entropía. Un valor alto de entropía indicaría que estamos en presencia de una fuente de la cual no podemos decir con cierta seguridad qué símbolo emitirá la fuente. En este caso el protocolo IPv6 es el que más información debido a su baja frecuencia de aparición.
+
+\subsubsection{Cafetería}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.65]{imgs/red2_capturar.png}
+	\caption{Distribución de protocolos de la red 2}
+      \label{red2_capturar}
+\end{figure}
+
+Vemos ahora en la figura \ref{red2_capturar} que nuevamente IPv4 sobresale del resto en términos de frecuencia de aparición. Tiene sentido ya que esta red es una red de acceso público que suelen usarse principalmente para acceder a Internet para navegar o enviar o recibir mails o mensajes. Luego le siguen los paquetes del protocolo ARP, cuya frecuencia de aparición elevada se puede atribuir a que en una red de acceso público inalámbrica es común que constantemente se vayan agregando o retirando nodos de la red. Cada vez que un dispositivo nuevo se conecta a la red tiene que saber a qué nodo mandar los paquetes para poder acceder a Internet.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.65]{imgs/red2_capturar_entropia.png}
+	\caption{Cantidad de información que aporta cada protocolo, junto a la entropía de la fuente}
+      \label{red2_capturar_entropia}
+\end{figure}
+
+En el caso de la figura \ref{red2_capturar_entropia} los paquetes con protocolo IPv6 son aún menos frecuentes que los anteriores ya que es una red de acceso público en la cuál se conecta toda variedad de dispositivos comerciales que sólo soportan el protocolo IPv4. Es por eso que la cantidad de información que aporta es muy alta. La entropía disminuye en medida de que un protocolo se vuelve cada vez más frecuente, como sucede en este caso en comparación a la red de la universidad.
+
+\subsubsection{Ambientes laborales}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.65]{imgs/red3_capturar.png}
+	\caption{Distribución de protocolos de la red 3}
+      \label{red3_capturar}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.65]{imgs/red3_capturar_entropia.png}
+	\caption{Cantidad de información que aporta cada protocolo, junto a la entropía de la fuente}
+      \label{red3_capturar_entropia}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.65]{imgs/red4_capturar.png}
+	\caption{Distribución de protocolos de la red 4}
+      \label{red4_capturar}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.65]{imgs/red4_capturar_entropia.png}
+	\caption{Cantidad de información que aporta cada protocolo, junto a la entropía de la fuente}
+      \label{red4_capturar_entropia}
+\end{figure}
+
+Ahora vemos el caso de redes de ambientes laborales de las figuras \ref{red3_capturar} y \ref{red4_capturar} en donde se espera que sea estable en cantidad de nodos de que se conectan o desconectan a la red. En ambos casos el protocolo IPv4 es el más frecuente de todos y mucho más en comparación que las redes anteriores. Si los dispositivos se conectan a un servidor remoto en otra red (u otro país) es esperable ver muchos paquetes IP yendo a través de la red. 
+
+También podemos observar tanto en la figura \ref{red3_capturar_entropia} y \ref{red4_capturar_entropia} que, al haber un protocolo tan frecuente, disminuye la entropía en comparación con las otras 2 redes anteriores. Asimismo aumenta la cantidad de información que aportan los protocolos IPv6 y ARP.
+
+
 \newpage
+\subsection{Experimento de identificación de nodos}
 
+Veamos ahora el resultado de correr la herramienta \texttt{identificar.py} sobre las mismas capturas de las redes anteriores pero considerando a la fuente de información $S_1$ como aquella que emite direcciones de IP que aparecen como destino en los paquetes WHO\_HAS.
 
-\subsection{Experimento 2}
-En este caso como se trataba de una red empresarial tuvimos que tomar recortes del grafo de envío de paquetes, ya que de lo contrario
-se tornaba ilegible. Capturamos solo partes que colaboran con el objetivo de recolectar nodos distinguidos. 
-Aclaración: En los 2 siguientes gráficos, el nodo apuntado representa a la IP origen mientras que el nodo apuntador es la IP destino.
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.65]{imgs/red1_identificar.png}
+	\caption{Cantidad de apariciones de direcciones IP en los paquetes ARP de la red 1}
+      \label{red1_identificar}
+\end{figure}
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.65]{imgs/red2_identificar.png}
+	\caption{Cantidad de apariciones de direcciones IP en los paquetes ARP de la red 2}
+      \label{red2_identificar}
+\end{figure}
 
-% \begin{figure}[H]
-% 	\centering
-% 	\includegraphics[scale = 0.5]{graficos/receptores_who_has_parte1_atos.png}
-% 	\caption{paquetes who has en una empresarial}
-% 	\label{receptoraswhohasatos}	
-% \end{figure}
-% 
-% 
-% \begin{figure}[H]
-% 	\centering
-% 	\includegraphics[scale = 0.5]{graficos/receptores_who_has_atos_parte2.png}
-% 	\caption{paquetes who has en una red empresarial(segundo nodo)}
-% 	\label{receptoraswhohasatos2 }	
-% \end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.65]{imgs/red3_identificar.png}
+	\caption{Cantidad de apariciones de direcciones IP en los paquetes ARP de la red 3}
+      \label{red3_identificar}
+\end{figure}
 
-Aclaración: En los 2 siguientes gráficos, el nodo apuntado representa a la IP destino mientras que el nodo apuntador es la IP origen.
-
-% \begin{figure}[H]
-% 	\centering
-% 	\includegraphics[scale = 0.5]{graficos/emisoras_is_at_red_atos.png}
-% 	\caption{paquetes is at en una empresarial}
-% 	\label{emisorasisatatos1 }	
-% \end{figure}
-% 
-% 
-% \begin{figure}[H]
-% 	\centering
-% 	\includegraphics[scale = 0.3]{graficos/emisoras_is_at_atos.png}
-% 	\caption{paquetes is at en una empresarial(segundo nodo)}
-% 	\label{emisorasisatatos2 }
-% \end{figure}
-
-
-
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.65]{imgs/red4_identificar.png}
+	\caption{Cantidad de apariciones de direcciones IP en los paquetes ARP de la red 4}
+      \label{red4_identificar}
+\end{figure}
